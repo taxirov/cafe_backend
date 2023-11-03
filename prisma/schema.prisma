@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  worker
+  user
+  dishwasher
+  chef
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  name        String
+  username    String   @unique
+  password    String
+  image       String?
+  phone       String
+  salary      Int
+  role        Role     @default(user)
+  joined_date DateTime @default(now())
+  update_date DateTime @updatedAt
+
+  orders   Order[]
+  products ProductInOrder[]
+  books    Book[]
+}
+
+model Category {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  desc         String
+  image        String
+  created_date DateTime @default(now())
+  update_date  DateTime @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  price        Int
+  category_id  Int
+  desc         String
+  image        String
+  created_date DateTime @default(now())
+  update_date  DateTime @updatedAt
+
+  category Category         @relation(references: [id], fields: [category_id])
+  products ProductInOrder[]
+}
+
+model Order {
+  id           Int      @id @default(autoincrement())
+  title        String
+  desc         String
+  worker_id    Int
+  room_id      Int
+  total_price  Int
+  created_date DateTime @default(now())
+  update_date  DateTime @updatedAt
+
+  worker   User             @relation(references: [id], fields: [worker_id])
+  room     Room             @relation(references: [id], fields: [room_id])
+  products ProductInOrder[]
+}
+
+model ProductInOrder {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  order_id     Int
+  product_id   Int
+  created_date DateTime @default(now())
+  update_date  DateTime @updatedAt
+
+  user    User    @relation(references: [id], fields: [user_id])
+  order   Order   @relation(references: [id], fields: [order_id])
+  product Product @relation(references: [id], fields: [product_id])
+}
+
+model Room {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  desc         String
+  capacity     Int
+  booked       Boolean  @default(false)
+  created_date DateTime @default(now())
+  update_date  DateTime @updatedAt
+
+  books  Book[]
+  orders Order[]
+}
+
+model Book {
+  id      Int     @id @default(autoincrement())
+  room_id Int
+  user_id Int
+  price   Int
+  person  Int
+  booker  String
+  desc    String?
+  status  Boolean @default(true)
+
+  room Room @relation(references: [id], fields: [room_id])
+  user User @relation(references: [id], fields: [user_id])
+}
