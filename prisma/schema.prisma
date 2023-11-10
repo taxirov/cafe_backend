@@ -35,7 +35,7 @@ model User {
 model Category {
   id           Int      @id @default(autoincrement())
   name         String   @unique
-  desc         String
+  desc         String?
   image        String
   created_date DateTime @default(now())
   update_date  DateTime @updatedAt
@@ -48,7 +48,7 @@ model Product {
   name         String   @unique
   price        Int
   category_id  Int
-  desc         String
+  desc         String?
   image        String
   created_date DateTime @default(now())
   update_date  DateTime @updatedAt
@@ -60,14 +60,14 @@ model Product {
 model Order {
   id           Int      @id @default(autoincrement())
   title        String
-  desc         String
-  worker_id    Int
+  desc         String?
+  user_id      Int
   room_id      Int
-  total_price  Int
+  total_price  Int?
   created_date DateTime @default(now())
   update_date  DateTime @updatedAt
 
-  worker   User             @relation(references: [id], fields: [worker_id])
+  user     User             @relation(references: [id], fields: [user_id])
   room     Room             @relation(references: [id], fields: [room_id])
   products ProductInOrder[]
 }
@@ -88,7 +88,7 @@ model ProductInOrder {
 model Room {
   id           Int      @id @default(autoincrement())
   name         String   @unique
-  desc         String
+  desc         String?
   capacity     Int
   booked       Boolean  @default(false)
   created_date DateTime @default(now())
@@ -99,14 +99,16 @@ model Room {
 }
 
 model Book {
-  id      Int     @id @default(autoincrement())
-  room_id Int
-  user_id Int
-  price   Int
-  person  Int
-  booker  String
-  desc    String?
-  status  Boolean @default(true)
+  id           Int      @id @default(autoincrement())
+  room_id      Int
+  user_id      Int
+  price        Int
+  person       Int
+  booker       String?
+  desc         String?
+  status       Boolean  @default(true)
+  created_date DateTime @default(now())
+  update_date  DateTime @updatedAt
 
   room Room @relation(references: [id], fields: [room_id])
   user User @relation(references: [id], fields: [user_id])

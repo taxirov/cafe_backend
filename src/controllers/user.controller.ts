@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/user.service';
+import jwt from 'jsonwebtoken';
 
 const userService = new UserService();
 
 export class UserController {
-  public post = async (req: Request, res: Response) => {
+  register = async (req: Request, res: Response) => {
     try {
       const { name, username, password, salary, role, phone } = req.body;
       const user_exsist = await userService.findByUsername(username)
@@ -12,29 +13,85 @@ export class UserController {
         res.status(403).json({ message: "User already exsist with username: " + username})
       } else {
         const user = await userService.create({ name, username, password, salary, role, phone });
-        res.status(201).json(user);
+        const payload = {
+            id: user.id,
+            name: user.name,
+            username: user.username,
+            phone: user.phone,
+            role: user.role,
+            salary: user.salary,
+            image: user.image
+        }
+        const token = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: "7d"})
+        res.status(200).json({
+            message: "Register success",
+            payload,
+            token
+        })
       }
     } catch (error) {
       res.status(500).json({ error: 'Error creating user' });
     }
   };
+
+  login = async (req: Request, res: Response) => {
+    try {
+      const { username, password } = req.body;
+      const user_exsist = await userService.findByUsername(username);
+      if(!user_exsist) {
+        res.status(404).json({
+          message: "User not found"
+        })
+      } else {
+        if(password === user_exsist.password) {
+          const payload = {
+            id: user_exsist.id,
+            name: user_exsist.name,
+            username: user_exsist.username,
+            phone: user_exsist.phone,
+            role: user_exsist.role,
+            salary: user_exsist.salary,
+            image: user_exsist.image
+        }
+        const token = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: "7d"})
+        res.status(200).json({
+            message: "Login success",
+            payload,
+            token
+        })
+        } else {
+          res.status(401).json({
+            message: "Password or username wrong"
+          })
+        }
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: "Error login user"
+      })
+    }
+  }
+  
+  getVerify = async (req: Request, res: Response) => {
+      res.status(200).json({
+          message: "All good"
+      })
+  }
  
-  public get = async (req: Request, res: Response) => {
+  getAll = async (req: Request, res: Response) => {
     try {
       const users = await userService.findAll()
-      if(users){
-        res.status(200).json({
+      res.status(200).json({
           message: "All users",
           users
         })
-      } else {
-        res.status(404).json({
-          message: "Users not found"
-        })
-      }
     } catch(error) {
       res.status(500).json({ error: 'Error getting users'})
     }
+  }
+
+  getById = async (req: Request, res: Response) => {
+    
   }
 }
 

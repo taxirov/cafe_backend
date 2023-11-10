@@ -6,7 +6,8 @@ export class CategoryService {
         return prisma.category.create({
             data: {
                 name: dto.name,
-                desc: dto.desc
+                desc: dto.desc,
+                image: dto.name
             }
         })
     }
@@ -16,6 +17,11 @@ export class CategoryService {
     public findById(id: number) {
         return prisma.category.findUnique({
             where: { id }
+        })
+    }
+    public findByName(name: string) {
+        return prisma.category.findUnique({
+            where: { name }
         })
     }
     public delete(id: number) {

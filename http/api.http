@@ -1,7 +1,7 @@
 @url=http://localhost:4800/api
 
 ###
-POST {{url}}/user
+POST {{url}}/user/register
 Content-Type: application/json
 
 {
@@ -15,6 +15,32 @@ Content-Type: application/json
 
 ###
 
-GET {{url}}/user
+POST {{url}}/user/login
+Content-Type: application/json
+
+{
+    "username": "sherali",
+    "password": "Sher1234"
+}
 
 ###
+
+POST {{url}}/category
+Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6ImFkbWluIiwic2FsYXJ5IjoyMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5NDY5OTkzLCJleHAiOjE3MDAwNzQ3OTN9.YpXA8UmOuagWexH1k55x26IsgHok6Di2Y_x2iyBrswM
+Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
+Content-Type: application/json
+
+{
+    "name": "Waters",
+    "desc": "this description"
+}
+
+###
+
+DELETE {{url}}/category/4
+Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6ImFkbWluIiwic2FsYXJ5IjoyMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5NDY5OTkzLCJleHAiOjE3MDAwNzQ3OTN9.YpXA8UmOuagWexH1k55x26IsgHok6Di2Y_x2iyBrswM
+Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
+
+###
+
+GET {{url}}/category

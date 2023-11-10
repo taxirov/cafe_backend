@@ -4,16 +4,26 @@ import { CategoryService } from "../services/category.service";
 const categoryService = new CategoryService();
 
 export class CategoryController {
-    public post = async (req: Request, res: Response) => {
+    post = async (req: Request, res: Response) => {
       try {
         const { name, desc } = req.body;
-        const category = await categoryService.create({ name, desc });
-        res.status(201).json(category);
+        const exsist_category = await categoryService.findByName(name);
+        if(exsist_category){
+          res.status(403).json({
+            message: "Category already exsist"
+          })
+        } else {
+          const category = await categoryService.create({ name, desc });
+          res.status(201).json({
+            message: "Category created",
+            category
+          });
+        }
       } catch (error) {
         res.status(500).json({ error: 'Error creating category' });
       }
     };
-    public get = async (req: Request, res: Response) => {
+    get = async (req: Request, res: Response) => {
         try {
             const categories = await categoryService.findAll()
             res.status(200).json({
@@ -23,6 +33,26 @@ export class CategoryController {
         } catch(error) {
             res.status(500).json({ error: "Error getting categories"})
         }
+    }
+    delete = async (req: Request, res: Response) => {
+      const { id } = req.params
+      try {
+        const exsist_category = await categoryService.findById(+id)
+        if(!exsist_category){
+          res.status(404).json({
+            message: "Not found category with id: " + id
+          })
+        } else {
+          const category = await categoryService.delete(+id)
+          res.status(200).json({
+            message: category.name + " category deleted"
+          })
+        }
+      } catch(error) {
+        res.status(500).json({
+          message: "Error deleting category"
+        })
+      }
     }
 }
 
