@@ -1,59 +1,93 @@
 import { Request, Response } from 'express';
-import ProductService from './product.service';
+import { ProductService } from '../services/product.service';
 
 const productService = new ProductService();
 
 export class ProductController {
-  async createProduct(req: Request, res: Response) {
+  async post(req: Request, res: Response) {
     try {
-      const { name, price, category_id, desc, image } = req.body;
-      const product = await productService.createProduct({ name, price, category_id, desc, image });
-      res.status(201).json(product);
+      const { name, price, category_id, desc } = req.body;
+      const product = await productService.create({ name, price, category_id, desc });
+      res.status(201).json({
+        message: "Product success created",
+        product
+      });
     } catch (error) {
       res.status(500).json({ error: 'Error creating product' });
     }
   }
 
-  async updateProduct(req: Request, res: Response) {
-    const productId = parseInt(req.params.id);
-    const { name, price, category_id, desc, image } = req.body;
+  // async put(req: Request, res: Response) {
+  //   const productId = parseInt(req.params.id);
+  //   const { name, price, category_id, desc, image } = req.body;
 
+  //   try {
+  //     const product = await productService.update(productId, { name, price, category_id, desc, image });
+  //     if (product) {
+  //       res.json(product);
+  //     } else {
+  //       res.status(404).json({ error: 'Product not found' });
+  //     }
+  //   } catch (error) {
+  //     res.status(500).json({ error: 'Error updating product' });
+  //   }
+  // }
+
+  async delete(req: Request, res: Response) {
+    const { id } = req.params
     try {
-      const product = await productService.updateProduct(productId, { name, price, category_id, desc, image });
+      const product = await productService.delete(+id);
       if (product) {
-        res.json(product);
+        res.status(200).json({
+          message: "Product success deleted",
+          product
+        });
       } else {
-        res.status(404).json({ error: 'Product not found' });
-      }
-    } catch (error) {
-      res.status(500).json({ error: 'Error updating product' });
-    }
-  }
-
-  async deleteProduct(req: Request, res: Response) {
-    const productId = parseInt(req.params.id);
-
-    try {
-      const product = await productService.deleteProduct(productId);
-      if (product) {
-        res.json(product);
-      } else {
-        res.status(404).json({ error: 'Product not found' });
+        res.status(404).json({ message: 'Product not found' });
       }
     } catch (error) {
       res.status(500).json({ error: 'Error deleting product' });
     }
   }
 
-  async getProduct(req: Request, res: Response) {
-    const productId = parseInt(req.params.id);
-
+  async getById(req: Request, res: Response) {
+    const { id } = req.params
     try {
-      const product = await productService.getProduct(productId);
+      const product = await productService.findById(+id);
       if (product) {
-        res.json(product);
+        res.status(200).json({
+          message: "Product by id: " + id,
+          product
+        });
       } else {
-        res.status(404).json({ error: 'Product not found' });
+        res.status(404).json({ message: 'Product not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ error: 'Error fetching product' });
+    }
+  }
+
+  async get(req: Request, res: Response) {
+    const { category_id } = req.query
+    try {
+      if(category_id){
+        const products = await productService.findByCategoryId(+category_id)
+        if(products.length == 0) {
+          res.status(404).json({
+            message: "No products by category id: " + category_id
+          })
+        } else {
+          res.status(200).json({
+            message: "Products by category id: " + category_id,
+            products
+          })
+        }
+      } else {
+        const products = await productService.findMany()
+          res.status(200).json({
+            message: "All products",
+            products
+          })
       }
     } catch (error) {
       res.status(500).json({ error: 'Error fetching product' });
