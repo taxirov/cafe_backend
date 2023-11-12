@@ -82,7 +82,8 @@ export class ProductController {
         const products = await productService.findByCategoryId(+category_id)
         if(products.length == 0) {
           res.status(404).json({
-            message: "No products by category id: " + category_id
+            message: "No products by category id: " + category_id,
+            products
           })
         } else {
           res.status(200).json({
@@ -98,7 +99,7 @@ export class ProductController {
           })
       }
     } catch (error) {
-      res.status(500).json({ error: 'Error fetching product' });
+      res.status(500).json({ message: 'Error fetching product' });
     }
   }
 }

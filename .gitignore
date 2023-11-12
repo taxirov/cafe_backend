@@ -1,5 +1,5 @@
-http
-node_modules
-prisma
+/http
+/node_modules
+/prisma
 .env
 .package-lock.json

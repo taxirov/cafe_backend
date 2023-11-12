@@ -43,4 +43,7 @@ export class OrderService {
     async findByStatus(status: boolean) {
         return await prisma.order.findMany({ where: { status }})
     }
+    async updateStatus(id: number, status: boolean) {
+        return await prisma.order.update({ where: { id }, data: { status }})
+    }
 }
