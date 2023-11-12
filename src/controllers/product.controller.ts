@@ -7,11 +7,19 @@ export class ProductController {
   async post(req: Request, res: Response) {
     try {
       const { name, price, category_id, desc } = req.body;
-      const product = await productService.create({ name, price, category_id, desc });
-      res.status(201).json({
-        message: "Product success created",
-        product
-      });
+      const product_exsist = await productService.findByName(name)
+      if(product_exsist) {
+        res.status(403).json({
+          message: "Product already exsist by name: " + name,
+          product: product_exsist
+        })
+      } else {
+        const product = await productService.create({ name, price, category_id, desc });
+        res.status(201).json({
+          message: "Product success created",
+          product
+        });
+      }
     } catch (error) {
       res.status(500).json({ error: 'Error creating product' });
     }

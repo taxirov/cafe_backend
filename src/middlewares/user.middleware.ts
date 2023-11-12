@@ -23,33 +23,21 @@ export async function checkToken(req: Request, res: Response, next: NextFunction
 
 export async function checkAdmin(req: Request, res: Response, next: NextFunction) {
     const admin_key = req.header('admin-key')
-    const token = req.header('access-token')
-    if (!token) {
+    if (!admin_key) {
         return res.status(403).json({
-            message: "Token not provided"
+            message: "Admin key not provided"
         })
     } else {
-        if (!admin_key) {
-            return res.status(403).json({
-                message: "Admin key not provided"
-            })
-        } else {
-            const payload = jwt.verify(token, process.env.SECRET_KEY!)
-            if (typeof(payload) !== 'string' && payload.role === "admin") {
-                if (admin_key === process.env.ADMIN_KEY) {
-                    next()
-                } else {
-                    res.status(401).json({
-                        message: "Admin key wrong"
-                    })
-                }
+            if (admin_key === process.env.ADMIN_KEY) {
+                next()
             } else {
-                res.status(403).json({
-                    message: "Your are not admin"
+                res.status(401).json({
+                    message: "Admin key wrong"
                 })
             }
         }
-    }
+    
 }
+
 
 

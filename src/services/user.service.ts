@@ -1,9 +1,8 @@
 import prisma from "../database";
 import { UserServiceModel } from "../models/user.model";
-import { Role } from "@prisma/client";
 
 export class UserService {
-    public async create(dto: UserServiceModel) {
+    async create(dto: UserServiceModel) {
         return await prisma.user.create({
             data: {
                 name: dto.name,
@@ -11,39 +10,37 @@ export class UserService {
                 password: dto.password,
                 salary: dto.salary,
                 phone: dto.phone,
-                role: dto.role as Role
+                role_id: dto.role_id
             }
         })
     }
-    public async findAll() {
+    async findAll() {
         return await prisma.user.findMany()
     }
-    public async findById(id: number) {
-        return await prisma.user.findUnique({
-            where: { id }
-        })
+    async findById(id: number) {
+        return await prisma.user.findUnique({ where: { id } })
     }
-    public async findByUsername(username: string) {
+    async findByUsername(username: string) {
         return await prisma.user.findUnique({
             where: { username }
         })
     }
-    public async changeRole(id: number, role: Role) {
-        return await prisma.user.update({
-            where: { id }, 
-            data: { role }
-        })
+    async updateRole(id: number, role_id: number) {
+        return await prisma.user.update({ data: { role_id }, where: { id }})
     }
-    public async changeUsername(id: number, username: string) {
+    async updateUsername(id: number, username: string) {
+        return await prisma.user.update({ where: { id }, data: { username }})
+    }
+    async updatePassword(id: number, password: string) {
+        return await prisma.user.update({ where: { id }, data: { password }})
+    }
+    async updateData(id: number, name: string, username: string, phone: string, salary: number) {
         return await prisma.user.update({
             where: { id },
-            data: { username }
+            data: { name, username, phone, salary }
         })
     }
-    public async changeName(id: number, name: string) {
-        return await prisma.user.update({
-            where: { id },
-            data: { name }
-        })
+    async delete(id: number) {
+        return await prisma.user.delete({ where: { id }})
     }
 }

@@ -2,14 +2,15 @@
 
 ###
 POST {{url}}/user/register
+Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
 Content-Type: application/json
 
 {
-    "name": "Sherali",
-    "username": "sherali",
-    "password": "Sher1234",
+    "name": "Saad Takhir",
+    "username": "saadtakhir",
+    "password": "Saad1234",
     "salary": 3000000,
-    "role": "admin",
+    "role_id": 1,
     "phone": "+998905589204"
 }
 
@@ -19,9 +20,15 @@ POST {{url}}/user/login
 Content-Type: application/json
 
 {
-    "username": "sherali",
-    "password": "Sher1234"
+    "username": "saadtakhir",
+    "password": "Saad1234"
 }
+
+###
+
+GET {{url}}/user
+Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5NzkzMTQ1LCJleHAiOjE3MDAzOTc5NDV9.hJuLYYzZ6sxJPwkF1vSNAtMsLNUvYFshd1aBPTGLQ-Y
+Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
 
 ###
 
@@ -31,7 +38,7 @@ Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
 Content-Type: application/json
 
 {
-    "name": "Breads",
+    "name": "Foods",
     "desc": "this description"
 }
 
@@ -63,6 +70,21 @@ Content-Type: application/json
 {
     "name": "Coca Cola 1.5", 
     "price": 13000, 
-    "category_id": 5, 
+    "category_id": 2, 
     "desc": "comment"
+}
+
+###
+
+GET {{url}}/role
+Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
+
+###
+
+POST {{url}}/role
+Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
+Content-Type: application/json
+
+{
+    "name": "waiter"
 }

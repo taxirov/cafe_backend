@@ -10,6 +10,6 @@ export type UserServiceModel = {
     username: string,
     password: string,
     salary: number,
-    role: string,
+    role_id: number,
     phone: string
 }

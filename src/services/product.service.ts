@@ -25,6 +25,9 @@ export class ProductService {
     async findById(id: number) {
         return await prisma.product.findUnique({ where: { id }})
     }
+    async findByName(name: string) {
+        return await prisma.product.findUnique({ where: { name }})
+    }
     async findByCategoryId(category_id: number) {
         return await prisma.product.findMany({ where: { category_id }})
     }

@@ -9,11 +9,11 @@ const validator = createValidator();
 const userController = new UserController()
 
 router.post('/register', validator.body(userValidationSchemaRegister), checkAdmin, userController.register);
-router.get('/', checkAdmin, userController.getAll)
+router.get('/', checkToken, checkAdmin, userController.getAll)
 router.post('/login', userController.login)
 router.get('/verify', checkToken, userController.getVerify)
-// router.put('/:id', validator.body(userValidationSchema), updateUser);
-// router.delete('/:id', deleteUser);
-// router.get('/:id', getUser);
+router.delete('/:id', checkToken, checkAdmin, userController.delete)
+router.get('/:id', checkToken, checkAdmin, userController.getById);
+router.put('/:id',  checkToken, checkAdmin, userController.put);
 
 export default router;
