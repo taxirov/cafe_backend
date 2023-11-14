@@ -11,6 +11,7 @@ import productRoutes from "./routes/product.routes";
 import roleRoutes from "./routes/role.routes"
 import orderRoutes from "./routes/order.routes"
 import roomRoutes from "./routes/room.routes"
+import productInOrderRoutes from "./routes/productinorder.routes"
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -25,6 +26,7 @@ app.use('/api/product', productRoutes)
 app.use('/api/role', roleRoutes)
 app.use('/api/order', orderRoutes)
 app.use('/api/room', roomRoutes)
+app.use('/api/productinorder', productInOrderRoutes)
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

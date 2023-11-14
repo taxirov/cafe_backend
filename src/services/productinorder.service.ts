@@ -2,38 +2,41 @@ import prisma from "../database"
 import { PrInOrServiceModel } from "../models/productinoder.model";
 
 export class ProductInOrderService {
-    public create(dto: PrInOrServiceModel) {
-        return prisma.productInOrder.create({
+    async create(dto: PrInOrServiceModel) {
+        return await prisma.productInOrder.create({
             data: {
                 user_id: dto.user_id,
                 order_id: dto.order_id,
-                product_id: dto.product_id
+                product_id: dto.product_id,
+                count: dto.count
             }
         })
     }
-    public delete(id: number) {
-        return prisma.productInOrder.delete({
-            where: { id }
+    async update(id: number, product_id: number, count: number) {
+        return await prisma.productInOrder.update({
+            where: { id },
+            data: {
+                product_id,
+                count
+            }
         })
     }
-    public findById(id: number){
-        return prisma.productInOrder.findMany({
-            where: { id }
-        })
+    async delete(id: number) {
+        return await prisma.productInOrder.delete({ where: { id }})
     }
-    public findByUserId(user_id: number){
-        return prisma.productInOrder.findMany({
-            where: { user_id }
-        })
+    async findAll(){
+        return await prisma.productInOrder.findMany()
     }
-    public findByOrderId(order_id: number){
-        return prisma.productInOrder.findMany({
-            where: { order_id }
-        })
+    async findById(id: number){
+        return await prisma.productInOrder.findUnique({ where: { id }})
     }
-    public findByProductId(product_id: number){
-        return prisma.productInOrder.findMany({
-            where: { product_id }
-        })
+    async findByUserId(user_id: number){
+        return await prisma.productInOrder.findMany({ where: { user_id }})
+    }
+    async findByOrderId(order_id: number){
+        return await prisma.productInOrder.findMany({ where: { order_id }})
+    }
+    async findByProductId(product_id: number){
+        return await prisma.productInOrder.findMany({ where: { product_id }})
     }
 }

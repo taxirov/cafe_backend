@@ -1,15 +1,16 @@
 import express from 'express';
-import { ProductInOrderController } from './productinorder.controller';
+import { checkAdmin, checkToken } from "../middlewares/user.middleware"
+import { ProductInOrderController } from '../controllers/productinorder.controller';
 import expressJoiValidation from 'express-joi-validation';
-import { productInOrderValidationSchema } from './productinorder.validation'; // Define productInOrderValidationSchema in a separate file
+import { prInOrValidationSchema, prInOrPutValidationSchema } from '../validations/productinorder.validation';
 
 const router = express.Router();
 const validator = expressJoiValidation.createValidator({ passError: true });
 const productInOrderController = new ProductInOrderController();
 
-router.post('/', validator.body(productInOrderValidationSchema), productInOrderController.createProductInOrder);
-router.put('/:id', validator.body(productInOrderValidationSchema), productInOrderController.updateProductInOrder);
-router.delete('/:id', productInOrderController.deleteProductInOrder);
-router.get('/:id', productInOrderController.getProductInOrder);
+router.post('/', checkToken, validator.body(prInOrValidationSchema), productInOrderController.post);
+router.put('/:id', checkToken, validator.body(prInOrPutValidationSchema), productInOrderController.put);
+router.delete('/:id', checkToken, productInOrderController.delete);
+router.get('/', checkToken, productInOrderController.get);
 
 export default router;

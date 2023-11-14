@@ -40,10 +40,25 @@ export class OrderService {
     async findByRoomId(room_id: number) {
         return await prisma.order.findMany({ where: { room_id }})
     }
-    async findByStatus(status: boolean) {
+    async findWaiterByStatus(user_id: number, status: boolean) {
+        return await prisma.order.findMany({ where: { user_id, status }})
+    }
+    async findByStatus( status: boolean) {
         return await prisma.order.findMany({ where: { status }})
+    }
+    async findByStatusRoom( status: boolean, room_id: number) {
+        return await prisma.order.findMany({ where: { status, room_id }})
+    }
+    async findWaiterByRoomId(user_id: number, room_id: number) {
+        return await prisma.order.findMany({ where: { user_id, room_id }})
+    }
+    async findWaiterByStatusAndRoomId(user_id: number, status: boolean, room_id: number) {
+        return await prisma.order.findMany({ where: { user_id, status, room_id }})
     }
     async updateStatus(id: number, status: boolean) {
         return await prisma.order.update({ where: { id }, data: { status }})
+    }
+    async updateTotal(id: number, total_price: number) {
+        return await prisma.order.update({ where: { id }, data: { total_price }})
     }
 }

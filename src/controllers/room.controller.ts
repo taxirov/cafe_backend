@@ -44,12 +44,13 @@ export class RoomController {
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
-
     try {
-      const room = await roomService.delete(+id);
-      if(room) {
+      const room_exsist = await roomService.findById(+id)
+      if(room_exsist) {
+        const room = await roomService.delete(+id);
         res.status(200).json({
-          message: "Room success deleted"
+          message: "Room success deleted",
+          room
         });
       } else {
         res.status(404).json({ message: 'Room not found' });

@@ -1,17 +1,38 @@
 import { Request, Response } from 'express';
 import { OrderService } from '../services/order.service';
+import { UserService } from "../services/user.service";
+import { RoleService } from "../services/role.service";
+import { RoomService } from "../services/room.service";
 
 const orderService = new OrderService();
+const userService = new UserService();
+const roleService = new RoleService();
+const roomService = new RoomService();
 
 export class OrderController {
   async post(req: Request, res: Response) {
+    const user_id = res.locals.payload.id
+    const { title, desc, room_id, total_price } = req.body;
     try {
-      const { title, desc, user_id, room_id, total_price } = req.body;
-      const order = await orderService.create({ title, desc, user_id, room_id, total_price });
-      res.status(201).json({
-        message: "Order success created",
-        order
-      });
+      const user_exsist = await userService.findById(+user_id)
+      if (!user_exsist) {
+        res.status(404).json({
+          message: "User not found by user_id: " + user_id
+        })
+      } else {
+        const room_exsist = await roomService.findById(+room_id)
+        if (!room_exsist) {
+          res.status(404).json({
+            message: "Room not found by room_id: " + room_id
+          })
+        } else {
+          const order = await orderService.create({ title, desc, user_id, room_id, total_price });
+          res.status(201).json({
+            message: "Order success created",
+            order
+          });
+        }
+      }
     } catch (error) {
       res.status(500).json({ message: 'Error creating order' });
     }
@@ -37,10 +58,10 @@ export class OrderController {
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
-
     try {
-      const order = await orderService.delete(+id);
-      if (order) {
+      const order_exsist = await orderService.findById(+id);
+      if (order_exsist) {
+        const order = await orderService.delete(+id);
         res.status(201).json({
           message: "Order success deleted",
           order
@@ -71,85 +92,78 @@ export class OrderController {
   }
 
   async get(req: Request, res: Response) {
-    const { user_id, status_order, room_id } = req.query;
+    const user = res.locals.payload
+    console.log(user)
+    const { status_order, room_id } = req.query;
     try {
-      // with user_id
-      if (user_id !== undefined && user_id !== '') {
-        // find by user_id
-        const orders_by_user = await orderService.findByUserId(+user_id)
-        // continue status_order
+      const user_role = await roleService.findById(user.role_id)
+      if (user_role?.name === 'admin') {
+        // admin orders with status_order
         if (status_order !== undefined && status_order !== '') {
-          // find by status
-          const orders_by_status = await orderService.findByStatus(Boolean(status_order))
-          // continue room_id
+          const ordersAdmSta = await orderService.findByStatus(Boolean(status_order))
           if (room_id !== undefined && room_id !== '') {
-            // find by room_id
-            const orders_by_room = await orderService.findByRoomId(+room_id)
-            // order by user_id, room_id and status_order
-            const orders = orders_by_user.concat(orders_by_room).concat(orders_by_status)
-            return res.status(200).json({
-              message: "Orders by user_id: " + user_id + " and room_id: " + room_id +  " and status_order: " + status_order,
-              orders
+            const ordersAdmStaRoom = await orderService.findByStatusRoom(Boolean(status_order), +room_id)
+            res.status(200).json({
+              message: "Orders by room_id: " + room_id + " and status_order: " + status_order,
+              orders: ordersAdmStaRoom
             })
           } else {
-            // orders by user_id and status_order
-            const orders = orders_by_user.concat(orders_by_status)
             res.status(200).json({
-              message: "Orders by user_id: " + user_id + " and status_order: " + status_order,
-              orders
-            })
-          }
-        } else {
-          if (room_id !== undefined && room_id !== '') {
-            // find by room_id
-            const orders_by_room = await orderService.findByRoomId(+room_id)
-            // order by user_id and room_id
-            const orders = orders_by_user.concat(orders_by_room)
-            return res.status(200).json({
-              message: "Orders by user_id: " + user_id + " and room_id: " + room_id,
-              orders
-            })
-          } else {
-            // orders by user
-            const orders = orders_by_user
-            res.status(200).json({
-              message: "Orders by user_id: " + user_id,
-              orders
+              message: "Orders by status_order: " + status_order,
+              orders: ordersAdmSta
             })
           }
         }
-      }
-      // with status_order
-      else if (status_order !== undefined && status_order !== '') {
-        const orders_by_status = await orderService.findByStatus(Boolean(status_order))
-        if (room_id !== undefined && room_id !== '') {
-          const orders_by_room = await orderService.findByRoomId(+room_id)
-          const orders = orders_by_status.concat(orders_by_room)
-          return res.status(200).json({
-            message: "Orders by room_id: " + room_id + " and status_order: " + status_order,
-            orders
-          })
-        } else {
+        // waiter orders with room_id
+        else if (room_id !== undefined && room_id !== '') {
+          const ordersAdmRoom = await orderService.findByRoomId(+room_id)
           res.status(200).json({
-            message: "Orders by status_order: " + status_order,
-            orders: orders_by_status
+            message: "Orders by room_id: " + room_id,
+            orders: ordersAdmRoom
           })
         }
-      }
-      // with room_id
-      else if (room_id !== undefined && room_id !== '') {
-        const orders_by_room = await orderService.findByRoomId(+room_id)
-        res.status(200).json({
-          message: "Orders by room_id: " + room_id,
-          orders: orders_by_room
-        })
+        // waiter orders
+        else {
+          const ordersAdm = await orderService.findAll()
+          res.status(200).json({
+            message: "All orders",
+            orders: ordersAdm
+          })
+        }
       } 
       else {
-        const orders = await orderService.findAll()
-        res.status(200).json({
-          message: "All orders",
-          orders
-        })
+        // waiter orders with status_order
+        if (status_order !== undefined && status_order !== '') {
+          const ordersWaiSta = await orderService.findWaiterByStatus(user.id, Boolean(status_order))
+          if (room_id !== undefined && room_id !== '') {
+            const ordersWaiStaRoom = await orderService.findWaiterByStatusAndRoomId(user.id, Boolean(status_order),+room_id)
+            res.status(200).json({
+              message: "Orders by room_id: " + room_id + " and status_order: " + status_order,
+              orders: ordersWaiStaRoom
+            })
+          } else {
+            res.status(200).json({
+              message: "Orders by status_order: " + status_order,
+              orders: ordersWaiSta
+            })
+          }
+        }
+        // waiter orders with room_id
+        else if (room_id !== undefined && room_id !== '') {
+          const ordersWaiRoom = await orderService.findWaiterByRoomId(user.id, +room_id)
+          res.status(200).json({
+            message: "Orders by room_id: " + room_id,
+            orders: ordersWaiRoom
+          })
+        }
+        // waiter orders
+        else {
+          const ordersWai = await orderService.findByUserId(user.id)
+          res.status(200).json({
+            message: user.name + " orders",
+            orders: ordersWai
+          })
+        }
       }
     } catch (error) {
       res.status(500).json({ error: 'Error fetching order' });
@@ -161,7 +175,7 @@ export class OrderController {
     const { status } = req.body
     try {
       const order_exsist = await orderService.findById(+id)
-      if(!order_exsist) {
+      if (!order_exsist) {
         res.status(404).json({
           message: "Order not found by id: " + id
         })
@@ -172,10 +186,33 @@ export class OrderController {
           order
         })
       }
-    } catch(error) {
+    } catch (error) {
       res.status(500).json({
         message: "Error patching status"
       })
     }
+  }
+
+  async patchTotal(req: Request, res: Response) {
+    const { id } = req.params
+    const { total_price } = req.body
+    try {
+      const order_exsist = await orderService.findById(+id)
+      if (!order_exsist) {
+        res.status(404).json({
+          message: "Order not found by id: " + id
+        })
+      } else {
+        const order = await orderService.updateTotal(+id, total_price)
+        res.status(200).json({
+          message: "Order total price success updated",
+          order
+        })
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: "Error patching total price"
+      })
     }
+  }
 }
