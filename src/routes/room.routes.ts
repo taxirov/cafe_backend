@@ -12,6 +12,6 @@ router.post('/', validator.body(roomValidationSchema), checkToken, checkAdmin, r
 router.put('/:id', validator.body(roomValidationSchema), checkToken, checkAdmin, roomController.put);
 router.delete('/:id', checkToken, checkAdmin, roomController.delete);
 router.get('/:id', checkToken, checkAdmin, roomController.getById);
-router.get('/', checkToken, checkAdmin, roomController.get)
+router.get('/', checkToken, roomController.get)
 
 export default router;

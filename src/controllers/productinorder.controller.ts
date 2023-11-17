@@ -11,7 +11,8 @@ const productService = new ProductService()
 
 export class ProductInOrderController {
   async post(req: Request, res: Response) {
-    const { user_id, order_id, product_id, count } = req.body;
+    const user_id = res.locals.payload.id
+    const { order_id, product_id, count } = req.body;
     try {
       const user_exsist = await userService.findById(+user_id)
       if(!user_exsist) {

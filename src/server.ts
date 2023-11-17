@@ -8,10 +8,14 @@ import cors from "cors";
 import userRoutes from "./routes/user.routes";
 import categoryRoutes from "./routes/category.routes";
 import productRoutes from "./routes/product.routes";
-import roleRoutes from "./routes/role.routes"
-import orderRoutes from "./routes/order.routes"
-import roomRoutes from "./routes/room.routes"
-import productInOrderRoutes from "./routes/productinorder.routes"
+import roleRoutes from "./routes/role.routes";
+import orderRoutes from "./routes/order.routes";
+import roomRoutes from "./routes/room.routes";
+import productInOrderRoutes from "./routes/productinorder.routes";
+import { createRoleAdmin } from "./middlewares/user.middleware";
+
+// create role admin
+createRoleAdmin()
 
 const app = express();
 const port = process.env.PORT || 3000;

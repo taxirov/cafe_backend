@@ -46,14 +46,14 @@ export class RoomController {
     const { id } = req.params;
     try {
       const room_exsist = await roomService.findById(+id)
-      if(room_exsist) {
+      if(!room_exsist) {
+        res.status(404).json({ message: 'Room not found' });
+      } else {
         const room = await roomService.delete(+id);
         res.status(200).json({
           message: "Room success deleted",
           room
         });
-      } else {
-        res.status(404).json({ message: 'Room not found' });
       }
     } catch (error) {
       res.status(500).json({ message: 'Error deleting room' });

@@ -1,11 +1,26 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/user.service';
 import jwt from 'jsonwebtoken';
+import { RoleService } from '../services/role.service';
+
+type UserResponse = {
+  id: number,
+  name: string,
+  username: string,
+  image: null | string,
+  phone: string,
+  salary: number,
+  role: string | undefined,
+  joined_date: string,
+  update_date: string
+}
 
 const userService = new UserService();
+const roleService = new RoleService()
 
 export class UserController {
-  register = async (req: Request, res: Response) => {
+  // done
+  async register(req: Request, res: Response) {
     try {
       const { name, username, password, salary, role_id, phone } = req.body;
       const user_exsist = await userService.findByUsername(username)
@@ -13,19 +28,20 @@ export class UserController {
         res.status(403).json({ message: "User already exsist with username: " + username})
       } else {
         const user = await userService.create({ name, username, password, salary, role_id, phone });
+        const role = await roleService.findById(role_id)
         const payload = {
             id: user.id,
             name: user.name,
             username: user.username,
             phone: user.phone,
-            role_id: user.role_id,
+            role: role?.name,
             salary: user.salary,
             image: user.image
         }
         const token = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: "7d"})
         res.status(200).json({
             message: "Register success",
-            payload,
+            user: payload,
             token
         })
       }
@@ -34,7 +50,8 @@ export class UserController {
     }
   };
 
-  login = async (req: Request, res: Response) => {
+  // done
+  async login(req: Request, res: Response) {
     try {
       const { username, password } = req.body;
       const user_exsist = await userService.findByUsername(username);
@@ -44,19 +61,20 @@ export class UserController {
         })
       } else {
         if(password === user_exsist.password) {
+          const role = await roleService.findById(user_exsist.role_id)
           const payload = {
             id: user_exsist.id,
             name: user_exsist.name,
             username: user_exsist.username,
             phone: user_exsist.phone,
-            role_id: user_exsist.role_id,
+            role: role?.name,
             salary: user_exsist.salary,
             image: user_exsist.image
         }
         const token = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: "7d"})
         res.status(200).json({
             message: "Login success",
-            payload,
+            user: payload,
             token
         })
         } else {
@@ -72,28 +90,51 @@ export class UserController {
     }
   }
   
-  getVerify = async (req: Request, res: Response) => {
-      res.status(200).json({
-          message: "All good"
-      })
+  // done
+  async getTokenVerify(req: Request, res: Response) {
+    const user = res.locals.payload
+    res.status(200).json({
+        message: "Verify success",
+        user
+    })
+  }
+
+  // done
+  async getAdminVerify(req: Request, res: Response) {
+    res.status(200).json({
+        message: "Verify success"
+    })
   }
  
+  // done
   getAll = async (req: Request, res: Response) => {
     try {
       const users = await userService.findAll()
+      let users_res: UserResponse[] = []
+      for(let i = 0; i < users.length; i++) {
+        const role = await roleService.findById(users[i].role_id)
+        users_res.push({
+          id: users[i].id,
+          name: users[i].name,
+          username: users[i].username,
+          image: users[i].image,
+          phone: users[i].phone,
+          salary: users[i].salary,
+          role: role?.name,
+          joined_date: users[i].joined_date.toString(),
+          update_date: users[i].update_date.toString()
+        })
+      }
       res.status(200).json({
           message: "All users",
-          users
+          users: users_res
         })
     } catch(error) {
       res.status(500).json({ error: 'Error getting users'})
     }
   }
 
-  getById = async (req: Request, res: Response) => {
-    
-  }
-
+  // done
   delete = async (req: Request, res: Response) => {
     const { id } = req.params
     try {
@@ -104,18 +145,21 @@ export class UserController {
         })
       } else {
         const user_deleted = await userService.delete(+id)
-        const payload = {
+        const role = await roleService.findById(user.role_id)
+        const user_res: UserResponse = {
             id: user_deleted.id,
             name: user_deleted.name,
             username: user_deleted.username,
             phone: user_deleted.phone,
-            role_id: user_deleted.role_id,
+            role: role?.name,
             salary: user_deleted.salary,
-            image: user_deleted.image
+            image: user_deleted.image,
+            joined_date: user_deleted.joined_date.toString(),
+            update_date: user_deleted.update_date.toString()
         }
         res.status(200).json({
           message: "User already deleted by id: " + id,
-          payload
+          user: user_res
         })
       }
     } catch(error) {

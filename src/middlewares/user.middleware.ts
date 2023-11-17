@@ -1,18 +1,20 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from 'jsonwebtoken'
-import type { JwtPayload } from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
+import { RoleService } from "../services/role.service";
+const roleService = new RoleService()
 
 export async function checkToken(req: Request, res: Response, next: NextFunction) {
-    const token = req.header('access-token')
-    if (!token) {
-        return res.status(403).json({
-            message: "Token not provided"
-        })
-    }
     try {
-        const payload = jwt.verify(token, process.env.SECRET_KEY!)
-        res.locals.payload = payload
-        next()
+        const token = req.header('access-token')
+        if (!token) {
+            res.status(403).json({
+                message: "Token not provided"
+            })
+        } else {
+            const payload = jwt.verify(token, process.env.SECRET_KEY!)
+            res.locals.payload = payload
+            next()
+        }
     }
     catch (err: any) {
         res.status(401).json({
@@ -39,5 +41,11 @@ export async function checkAdmin(req: Request, res: Response, next: NextFunction
     
 }
 
+export async function createRoleAdmin() {
+    const role_exsist = await roleService.findByName('admin')
+    if(role_exsist === null) {
+        return await roleService.create('admin')          
+    }
+}
 
 

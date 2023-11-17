@@ -1,14 +1,12 @@
 import Joi from 'joi';
 
  export const prInOrValidationSchema = Joi.object({
-    user_id: Joi.number().required(),
     order_id: Joi.number().required(),
     product_id: Joi.number().required(),
     count: Joi.number().required()
 })
 
 export const prInOrPutValidationSchema = Joi.object({
-    user_id: Joi.number().required(),
     order_id: Joi.number().required(),
     product_id: Joi.number().required(),
     count: Joi.number().required()

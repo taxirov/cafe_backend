@@ -93,7 +93,6 @@ export class OrderController {
 
   async get(req: Request, res: Response) {
     const user = res.locals.payload
-    console.log(user)
     const { status_order, room_id } = req.query;
     try {
       const user_role = await roleService.findById(user.role_id)

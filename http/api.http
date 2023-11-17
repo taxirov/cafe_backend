@@ -1,6 +1,11 @@
 @url=http://localhost:4800/api
 
 ###
+GET {{url}}/user
+Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
+Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
+
+###
 POST {{url}}/user/login
 Content-Type: application/json
 
@@ -48,13 +53,13 @@ Content-Type: application/json
 
 GET {{url}}/room
 Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
+
 
 ###
 
 DELETE {{url}}/room/5
 Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
+Admin-Key: 1234
 
 ###
 
@@ -93,3 +98,21 @@ Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
 
 ###
 
+GET {{url}}/productinorder
+Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
+
+###
+
+POST {{url}}/productinorder
+Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
+Content-Type: application/json
+
+{
+    "order_id": 5,
+    "product_id": 5,
+    "count": 2
+}
+
+###
+GET {{url}}/role
+Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf

@@ -9,7 +9,7 @@ const validator = createValidator();
 const roleController = new RoleController()
 
 router.post('/', validator.body(roleBodySchema), checkAdmin, roleController.post);
-router.get('/', checkAdmin, roleController.get)
+router.get('/', roleController.get)
 router.delete('/:id', checkAdmin, roleController.delete)
 router.put('/:id',  validator.body(roleBodySchema), checkAdmin,roleController.put)
 
