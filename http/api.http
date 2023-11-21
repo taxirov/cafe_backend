@@ -3,20 +3,24 @@
 ###
 GET {{url}}/user
 Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
 
 ###
-POST {{url}}/user/login
+POST http://31.129.110.72:4800/api/user/register
 Content-Type: application/json
+Admin-Key: Admin9204
 
 {
+    "name": "Saad Takhir",
     "username": "saadtakhir",
-    "password": "Saad1234"
+    "password": "Saad1234",
+    "salary": 3000000,
+    "role_id": 1,
+    "phone": "+998905789204"
 }
 
 ###
 
-GET {{url}}/productinorder
+GET {{url}}/productinorder?order_id=5
 Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
 
 ###
@@ -39,9 +43,9 @@ Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgV
 
 ###
 
-POST {{url}}/order
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
+POST http://31.129.110.72:4800/api/user
 Content-Type: application/json
+Admin-Key: Admin9202
 
 {
     "title": "Order 1",
@@ -51,13 +55,12 @@ Content-Type: application/json
 
 ###
 
-GET {{url}}/room
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-
+GET {{url}}/order
+Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6ImFkbWluIiwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNzAwNDEzOTk0LCJleHAiOjE3MDEwMTg3OTR9.kHBIPDbXXt9VABj_IBOydaBodHPyKvcdN0p3pmqoLTY
 
 ###
 
-DELETE {{url}}/room/5
+DELETE {{url}}/room/10
 Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
 Admin-Key: 1234
 
@@ -65,7 +68,7 @@ Admin-Key: 1234
 
 POST {{url}}/room
 Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
+Admin-Key: 1234
 Content-Type: application/json
 
 {
@@ -76,8 +79,8 @@ Content-Type: application/json
 
 ###
 
-GET {{url}}/order
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
+GET {{url}}/product
+
 
 ###
 
@@ -86,15 +89,25 @@ Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgV
 Content-Type: application/json
 
 {
-    "title": "Zakaz 2",
-    "room_id": 5
+    "title": "Zakaz 3",
+    "desc": null,
+    "room_id": 1,
+    "total_price": null
 }
 
 ###
 
-DELETE {{url}}/order/3
+PATCH {{url}}/order/3/status
 Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
+Content-Type: application/json
+
+{
+    "status": false
+}
+
+###
+
+GET http://31.129.110.72:4800/api/product
 
 ###
 
@@ -104,15 +117,15 @@ Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgV
 ###
 
 POST {{url}}/productinorder
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
+Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6ImFkbWluIiwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNzAwNDEzOTk0LCJleHAiOjE3MDEwMTg3OTR9.kHBIPDbXXt9VABj_IBOydaBodHPyKvcdN0p3pmqoLTY
 Content-Type: application/json
 
 {
-    "order_id": 5,
-    "product_id": 5,
+    "order_id": 2,
+    "product_id": 3,
     "count": 2
 }
 
 ###
 GET {{url}}/role
-Admin-Key: opa039jf0w4fnio;sa;f49jfsif;i;fnafdnfldf
+Admin-Key: 1234

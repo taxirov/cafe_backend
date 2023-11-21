@@ -4,6 +4,7 @@ import { RoomService } from '../services/room.service';
 const roomService = new RoomService();
 
 export class RoomController {
+  // done
   async post(req: Request, res: Response) {
     try {
       const { name, desc, capacity, booked, image } = req.body;
@@ -24,6 +25,7 @@ export class RoomController {
     }
   }
 
+  // done
   async put(req: Request, res: Response) {
     const { id } = req.params;
     const { name, desc, capacity, booked, image } = req.body;
@@ -42,6 +44,7 @@ export class RoomController {
     }
   }
 
+  // done
   async delete(req: Request, res: Response) {
     const { id } = req.params;
     try {
@@ -53,13 +56,14 @@ export class RoomController {
         res.status(200).json({
           message: "Room success deleted",
           room
-        });
+        }); 
       }
     } catch (error) {
       res.status(500).json({ message: 'Error deleting room' });
     }
   }
 
+  // done
   async get(req: Request, res: Response) {
     try {
       const rooms = await roomService.findAll()
@@ -72,13 +76,15 @@ export class RoomController {
     }
   }
 
+  // done
   async getById(req: Request, res: Response) {
     const { id } = req.params;
     try {
       const room = await roomService.findById(+id);
       if (room) {
         res.status(200).json({
-          message: "Room by id: " + id
+          message: "Room by id: " + id,
+          room
         });
       } else {
         res.status(404).json({ message: 'Room not found' });

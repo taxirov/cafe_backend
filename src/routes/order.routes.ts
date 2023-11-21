@@ -15,5 +15,6 @@ router.get('/', checkToken, orderController.get);
 router.get('/:id', checkToken, orderController.getById)
 router.patch('/:id/status', checkToken, orderController.patchStatus)
 router.patch('/:id/total', checkToken, orderController.patchTotal)
+router.get('/all', checkToken, orderController.getAll)
 
 export default router;

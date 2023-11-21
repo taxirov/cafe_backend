@@ -66,7 +66,7 @@ model Order {
   user_id      Int
   room_id      Int
   total_price  Int?
-  status       Boolean  @default(true)
+  status       Int  @default(1)
   created_date DateTime @default(now())
   update_date  DateTime @updatedAt
 
@@ -111,7 +111,7 @@ model Book {
   person       Int
   booker       String?
   desc         String?
-  status       Boolean  @default(true)
+  status       Int  @default(1)
   created_date DateTime @default(now())
   update_date  DateTime @updatedAt
 
