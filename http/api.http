@@ -20,6 +20,16 @@ Admin-Key: Admin9204
 
 ###
 
+POST http://localhost:4800/api/user/login
+Content-Type: application/json
+
+{
+    "username": "saadtakhir",
+    "password": "Saad1234"
+}
+
+###
+
 GET {{url}}/productinorder?order_id=5
 Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
 
@@ -43,14 +53,13 @@ Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgV
 
 ###
 
-POST http://31.129.110.72:4800/api/user
+POST http://localhost:4800/api/order
+Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6ImFkbWluIiwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNzAwNjcyNTMyLCJleHAiOjE3MDEyNzczMzJ9.R7_KoC1-VYVszPRtNkZTplC6h43gh56Af1evvJaziPY
 Content-Type: application/json
-Admin-Key: Admin9202
 
 {
     "title": "Order 1",
-    "user_id": 3,
-    "room_id": 4
+    "room_id": 1
 }
 
 ###

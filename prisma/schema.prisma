@@ -12,81 +12,76 @@ model Role {
   name         String   @unique
   created_date DateTime @default(now())
   updated_date DateTime @updatedAt
-
-  user User[]
+  user         User[]
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   name        String
-  username    String   @unique
+  username    String           @unique
   password    String
   image       String?
   phone       String
+  email       String
   salary      Int
   role_id     Int
-  joined_date DateTime @default(now())
-  update_date DateTime @updatedAt
-
-  role     Role             @relation(fields: [role_id], references: [id])
-  orders   Order[]
-  products ProductInOrder[]
-  books    Book[]
+  joined_date String
+  update_date DateTime         @updatedAt
+  role        Role             @relation(fields: [role_id], references: [id])
+  orders      Order[]
+  products    ProductInOrder[]
+  books       Book[]
 }
 
 model Category {
-  id           Int      @id @default(autoincrement())
-  name         String   @unique
+  id           Int       @id @default(autoincrement())
+  name         String    @unique
   desc         String?
-  image        String
-  created_date DateTime @default(now())
-  update_date  DateTime @updatedAt
-
-  products Product[]
+  image        String?
+  created_date String
+  update_date  DateTime  @updatedAt
+  products     Product[]
 }
 
 model Product {
-  id           Int      @id @default(autoincrement())
-  name         String   @unique
+  id           Int              @id @default(autoincrement())
+  name         String           @unique
   price        Int
   category_id  Int
   desc         String?
-  image        String
-  created_date DateTime @default(now())
-  update_date  DateTime @updatedAt
-
-  category Category         @relation(references: [id], fields: [category_id])
-  products ProductInOrder[]
+  image        String?
+  created_date String
+  update_date  DateTime         @updatedAt
+  category     Category         @relation(references: [id], fields: [category_id])
+  products     ProductInOrder[]
 }
 
 model Order {
-  id           Int      @id @default(autoincrement())
+  id           Int              @id @default(autoincrement())
   title        String
   desc         String?
   user_id      Int
   room_id      Int
   total_price  Int?
-  status       Int  @default(1)
-  created_date DateTime @default(now())
-  update_date  DateTime @updatedAt
-
-  user     User             @relation(references: [id], fields: [user_id])
-  room     Room             @relation(references: [id], fields: [room_id])
-  products ProductInOrder[]
+  status       Int              @default(1)
+  created_date String
+  update_date  DateTime         @updatedAt
+  user         User             @relation(references: [id], fields: [user_id])
+  room         Room             @relation(references: [id], fields: [room_id])
+  products     ProductInOrder[]
 }
 
 model ProductInOrder {
-  id            Int      @id @default(autoincrement())
-  user_id       Int
-  order_id      Int
-  product_id    Int
-  count         Int
-  created_date  DateTime @default(now())
-  update_date   DateTime @updatedAt
-
-  user    User    @relation(references: [id], fields: [user_id])
-  order   Order   @relation(references: [id], fields: [order_id])
-  product Product @relation(references: [id], fields: [product_id])
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  order_id     Int
+  product_id   Int
+  count        Int
+  created_date String
+  update_date  DateTime @updatedAt
+  user         User     @relation(references: [id], fields: [user_id])
+  order        Order    @relation(references: [id], fields: [order_id])
+  product      Product  @relation(references: [id], fields: [product_id])
 }
 
 model Room {
@@ -96,11 +91,10 @@ model Room {
   capacity     Int
   image        String?
   booked       Boolean  @default(false)
-  created_date DateTime @default(now())
+  created_date String
   update_date  DateTime @updatedAt
-
-  books  Book[]
-  orders Order[]
+  books        Book[]
+  orders       Order[]
 }
 
 model Book {
@@ -111,10 +105,9 @@ model Book {
   person       Int
   booker       String?
   desc         String?
-  status       Int  @default(1)
-  created_date DateTime @default(now())
+  status       Int      @default(1)
+  created_date String
   update_date  DateTime @updatedAt
-
   room Room @relation(references: [id], fields: [room_id])
   user User @relation(references: [id], fields: [user_id])
 }

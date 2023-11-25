@@ -11,5 +11,7 @@ export type UserServiceModel = {
     password: string,
     salary: number,
     role_id: number,
-    phone: string
+    phone: string,
+    email: string,
+    joined_date: string
 }

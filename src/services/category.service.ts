@@ -2,31 +2,40 @@ import { CategoryServiceModel } from "../models/category.model";
 import prisma from "../database";
 
 export class CategoryService {
-    public create(dto: CategoryServiceModel) {
-        return prisma.category.create({
+    // done
+    async create(dto: CategoryServiceModel) {
+        return await prisma.category.create({
             data: {
                 name: dto.name,
                 desc: dto.desc,
-                image: dto.name
+                created_date: dto.created_date
             }
         })
     }
-    public findAll(){
-        return prisma.category.findMany()
+    // done
+    async findAll(){
+        return await prisma.category.findMany()
     }
-    public findById(id: number) {
-        return prisma.category.findUnique({
-            where: { id }
-        })
+    // done
+    async findById(id: number) {
+        return prisma.category.findUnique({ where: { id }})
     }
-    public findByName(name: string) {
-        return prisma.category.findUnique({
-            where: { name }
-        })
+    // done
+    async findByName(name: string) {
+        return prisma.category.findUnique({ where: { name }})
     }
-    public delete(id: number) {
-        return prisma.category.delete({
-            where: { id }
+    // done
+    async delete(id: number) {
+        return await prisma.category.delete({ where: { id }})
+    }
+    // done
+    async createImage(id: number, image: string) {
+        return await prisma.category.update({ data: { image }, where: { id }})
+    }
+    // done
+    async update(id: number, name: string, desc: string) {
+        return await prisma.category.update({
+            where: { id }, data: { name, desc }
         })
     }
 }

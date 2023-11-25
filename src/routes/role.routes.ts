@@ -11,6 +11,6 @@ const roleController = new RoleController()
 router.post('/', validator.body(roleBodySchema), checkAdmin, roleController.post);
 router.get('/', roleController.get)
 router.delete('/:id', checkAdmin, roleController.delete)
-router.put('/:id',  validator.body(roleBodySchema), checkAdmin,roleController.put)
+router.put('/:id',  validator.body(roleBodySchema), checkAdmin, roleController.put)
 
 export default router;

@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/user.service';
-import jwt from 'jsonwebtoken';
 import { RoleService } from '../services/role.service';
+import { OrderService } from '../services/order.service';
+import jwt from 'jsonwebtoken';
 
 type UserResponse = {
   id: number,
@@ -9,39 +10,51 @@ type UserResponse = {
   username: string,
   image: null | string,
   phone: string,
+  email: string,
   salary: number,
   role: string | undefined,
+  orders: number,
   joined_date: string,
   update_date: string
 }
 
 const userService = new UserService();
-const roleService = new RoleService()
+const roleService = new RoleService();
+const orderService = new OrderService();
 
 export class UserController {
   // done
   async register(req: Request, res: Response) {
     try {
-      const { name, username, password, salary, role_id, phone } = req.body;
+      const { name, username, password, salary, role_id, phone, email, joined_date } = req.body;
       const user_exsist = await userService.findByUsername(username)
       if(user_exsist){
         res.status(403).json({ message: "User already exsist with username: " + username})
       } else {
-        const user = await userService.create({ name, username, password, salary, role_id, phone });
+        const user = await userService.create({ name, username, password, salary, role_id, phone, email, joined_date });
         const role = await roleService.findById(role_id)
         const payload = {
             id: user.id,
             name: user.name,
             username: user.username,
-            phone: user.phone,
-            role: role?.name,
-            salary: user.salary,
-            image: user.image
+            phone: user.phone
         }
         const token = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: "7d"})
+        const user_res = {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          phone: user.phone,
+          email: user.email,
+          salary: user.salary,
+          orders: 0,
+          image: user.image,
+          role: role?.name,
+          joined_date: user.joined_date
+        }
         res.status(200).json({
             message: "Register success",
-            user: payload,
+            user: user_res,
             token
         })
       }
@@ -49,7 +62,6 @@ export class UserController {
       res.status(500).json({ error: 'Error creating user' });
     }
   };
-
   // done
   async login(req: Request, res: Response) {
     try {
@@ -66,15 +78,25 @@ export class UserController {
             id: user_exsist.id,
             name: user_exsist.name,
             username: user_exsist.username,
-            phone: user_exsist.phone,
-            role: role?.name,
-            salary: user_exsist.salary,
-            image: user_exsist.image
+            phone: user_exsist.phone
         }
         const token = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: "7d"})
+        const user_orders = await orderService.findByUserId(user_exsist.id)
+        const user_res = {
+          id: user_exsist.id,
+          name: user_exsist.name,
+          username: user_exsist.username,
+          phone: user_exsist.phone,
+          email: user_exsist.email,
+          salary: user_exsist.salary,
+          orders: user_orders.length,
+          image: user_exsist.image,
+          role: role?.name,
+          joined_date: user_exsist.joined_date
+        }
         res.status(200).json({
             message: "Login success",
-            user: payload,
+            user: user_res,
             token
         })
         } else {
@@ -89,23 +111,19 @@ export class UserController {
       })
     }
   }
-  
   // done
   async getTokenVerify(req: Request, res: Response) {
     const user = res.locals.payload
     res.status(200).json({
-        message: "Verify success",
-        user
+        message: "Verify success"
     })
   }
-
   // done
   async getAdminVerify(req: Request, res: Response) {
     res.status(200).json({
         message: "Verify success"
     })
   }
- 
   // done
   getAll = async (req: Request, res: Response) => {
     try {
@@ -113,15 +131,18 @@ export class UserController {
       let users_res: UserResponse[] = []
       for(let i = 0; i < users.length; i++) {
         const role = await roleService.findById(users[i].role_id)
+        const user_orders = await orderService.findByUserId(users[i].id)
         users_res.push({
           id: users[i].id,
           name: users[i].name,
           username: users[i].username,
           image: users[i].image,
           phone: users[i].phone,
+          email: users[i].email,
           salary: users[i].salary,
           role: role?.name,
-          joined_date: users[i].joined_date.toString(),
+          orders: user_orders.length,
+          joined_date: users[i].joined_date,
           update_date: users[i].update_date.toString()
         })
       }
@@ -133,7 +154,6 @@ export class UserController {
       res.status(500).json({ error: 'Error getting users'})
     }
   }
-
   // done
   delete = async (req: Request, res: Response) => {
     const { id } = req.params
@@ -146,14 +166,17 @@ export class UserController {
       } else {
         const user_deleted = await userService.delete(+id)
         const role = await roleService.findById(user.role_id)
+        const user_orders = await orderService.findByUserId(user_deleted.id)
         const user_res: UserResponse = {
             id: user_deleted.id,
             name: user_deleted.name,
             username: user_deleted.username,
             phone: user_deleted.phone,
+            email: user_deleted.email,
             role: role?.name,
             salary: user_deleted.salary,
             image: user_deleted.image,
+            orders: user_orders.length,
             joined_date: user_deleted.joined_date.toString(),
             update_date: user_deleted.update_date.toString()
         }
@@ -168,10 +191,9 @@ export class UserController {
       })
     }
   }
-
   async put(req: Request, res: Response) {
     const { id } = req.params
-    const { name, username, phone, salary } = req.body
+    const { name, username, salary, role_id, phone, email } = req.body
     try {
       const user_exsist = await userService.findById(+id)
       if(!user_exsist) {
@@ -179,16 +201,25 @@ export class UserController {
           message: "User not found by id: " + id
         })
       } else {
-          const user = await userService.updateData(+id, name, username, phone, salary)
-          const payload = {
+          const user = await userService.updateData(+id, name, username, phone, salary, email, role_id)
+          const role = await roleService.findById(user.role_id)
+          const user_orders = await orderService.findByUserId(user.id)
+          const user_res = {
             id: user.id,
             name: user.name,
             username: user.username,
             phone: user.phone,
-            role_id: user.role_id,
+            email: user.email,
             salary: user.salary,
-            image: user.image
-        }
+            orders: user_orders.length,
+            image: user.image,
+            role: role?.name,
+            joined_date: user.joined_date
+          }
+        res.status(200).json({
+            message: "User datas success update",
+            user: user_res
+        })
       }
     } catch(error) {
       res.status(500).json({
@@ -197,50 +228,3 @@ export class UserController {
     }
   }
 }
-
-
-// export const updateUser = async (req: Request, res: Response) => {
-//   const userId = parseInt(req.params.id);
-//   const { name, username, password, image, salary, role } = req.body;
-
-//   try {
-//     const user = await userService.updateUser(userId, { name, username, password, image, salary, role });
-//     if (user) {
-//       res.json(user);
-//     } else {
-//       res.status(404).json({ error: 'User not found' });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error updating user' });
-//   }
-// };
-
-// export const deleteUser = async (req: Request, res: Response) => {
-//   const userId = parseInt(req.params.id);
-
-//   try {
-//     const user = await userService.deleteUser(userId);
-//     if (user) {
-//       res.json(user);
-//     } else {
-//       res.status(404).json({ error: 'User not found' });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error deleting user' });
-//   }
-// };
-
-// export const getUser = async (req: Request, res: Response) => {
-//   const userId = parseInt(req.params.id);
-
-//   try {
-//     const user = await userService.getUser(userId);
-//     if (user) {
-//       res.json(user);
-//     } else {
-//       res.status(404).json({ error: 'User not found' });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error fetching user' });
-//   }
-// };

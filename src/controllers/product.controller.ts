@@ -4,9 +4,10 @@ import { ProductService } from '../services/product.service';
 const productService = new ProductService();
 
 export class ProductController {
+  // done
   async post(req: Request, res: Response) {
     try {
-      const { name, price, category_id, desc } = req.body;
+      const { name, price, category_id, desc, created_date } = req.body;
       const product_exsist = await productService.findByName(name)
       if(product_exsist) {
         res.status(403).json({
@@ -14,38 +15,41 @@ export class ProductController {
           product: product_exsist
         })
       } else {
-        const product = await productService.create({ name, price, category_id, desc });
+        const product = await productService.create({ name, price, category_id, desc, created_date });
         res.status(201).json({
           message: "Product success created",
           product
         });
       }
     } catch (error) {
-      res.status(500).json({ error: 'Error creating product' });
+      res.status(500).json({ message: 'Error creating product' });
     }
   }
-
-  // async put(req: Request, res: Response) {
-  //   const productId = parseInt(req.params.id);
-  //   const { name, price, category_id, desc, image } = req.body;
-
-  //   try {
-  //     const product = await productService.update(productId, { name, price, category_id, desc, image });
-  //     if (product) {
-  //       res.json(product);
-  //     } else {
-  //       res.status(404).json({ error: 'Product not found' });
-  //     }
-  //   } catch (error) {
-  //     res.status(500).json({ error: 'Error updating product' });
-  //   }
-  // }
-
-  async delete(req: Request, res: Response) {
-    const { id } = req.params
+  // done
+  async put(req: Request, res: Response) {
     try {
+      const { id } = req.params
+      const { name, price, category_id, desc } = req.body;
+      const product_exsist = await productService.findById(+id)
+      if (product_exsist) {
+        const product = await productService.update({id: +id, name, price, category_id, desc });
+        res.status(200).json({
+          message: "Product success updated",
+          product
+        });
+      } else {
+        res.status(404).json({ message: 'Product not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Error updating product' });
+    }
+  }
+  // done
+  async delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params
       const product = await productService.delete(+id);
-      if (product) {
+      if(product) {
         res.status(200).json({
           message: "Product success deleted",
           product
@@ -54,13 +58,13 @@ export class ProductController {
         res.status(404).json({ message: 'Product not found' });
       }
     } catch (error) {
-      res.status(500).json({ error: 'Error deleting product' });
+      res.status(500).json({ message: 'Error deleting product' });
     }
   }
-
+  // done
   async getById(req: Request, res: Response) {
-    const { id } = req.params
     try {
+      const { id } = req.params
       const product = await productService.findById(+id);
       if (product) {
         res.status(200).json({
@@ -71,14 +75,14 @@ export class ProductController {
         res.status(404).json({ message: 'Product not found' });
       }
     } catch (error) {
-      res.status(500).json({ error: 'Error fetching product' });
+      res.status(500).json({ message: 'Error fetching product' });
     }
   }
-
+  // done
   async get(req: Request, res: Response) {
-    const { category_id } = req.query
     try {
-      if(category_id){
+      const { category_id } = req.query
+      if(category_id !== undefined && category_id !== ''){
         const products = await productService.findByCategoryId(+category_id)
         if(products.length == 0) {
           res.status(404).json({
@@ -103,5 +107,3 @@ export class ProductController {
     }
   }
 }
-
-export default new ProductController();
