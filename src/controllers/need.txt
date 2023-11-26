@@ -1,0 +1,26 @@
+let products: ProductInOrder[]
+          let productInOrder: ProductInOrder
+          let user_product: { id: number, name: string }
+          let product_product: { id: number, name: string, price: number, image: string | null }
+          let total_price_product: number = 0
+          for (let i = 0; i < productInOrders.length; i++) {
+            const user = await userService.findById(productInOrders[i].user_id)
+            if (user) {
+              user_product = { id: user.id, name: user.name }
+            }
+            const product = await productService.findById(productInOrders[i].product_id)
+            if (product) {
+              product_product = { id: product.id, name: product.name, price: product.price, image: product.image }
+              total_price_product = productInOrders[i].count * product.price
+            }
+            productInOrder = {
+              id: productInOrders[i].id,
+              user: user_product!,
+              order_id: productInOrders[i].order_id,
+              product: product_product!,
+              count: productInOrders[i].count,
+              total_price: total_price_product,
+              created_date: productInOrders[i].created_date,
+              update_date: productInOrders[i].update_date.toString()
+            }
+          }
