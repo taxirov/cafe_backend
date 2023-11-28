@@ -8,12 +8,12 @@ const router = express.Router();
 const validator = createValidator();
 const userController = new UserController()
 
-router.post('/register', validator.body(userValidationSchemaRegister), checkAdmin, userController.register);
-router.get('/', checkToken, userController.getAll)
-router.post('/login', userController.login)
-router.get('/verify', checkToken, userController.getTokenVerify)
-router.get('/admin', checkAdmin, userController.getAdminVerify)
-router.delete('/:id', checkToken, checkAdmin, userController.delete)
-router.put('/:id',  checkToken, checkAdmin, userController.put)
+router.post('/register', validator.body(userValidationSchemaRegister), checkAdmin, userController.register) // success endpoint
+router.get('/', checkToken, userController.getAll) // success endpoint
+router.post('/login', userController.login) // success endpoint
+router.get('/verify', checkToken, userController.getTokenVerify) // success endpoint
+router.get('/admin', checkAdmin, userController.getAdminVerify) // success endpoint
+router.delete('/:id', checkToken, checkAdmin, userController.delete) // success endpoint
+router.put('/:id',  checkToken, checkAdmin, userController.put) // success endpoint
 
 export default router;

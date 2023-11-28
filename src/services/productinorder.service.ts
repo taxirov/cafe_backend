@@ -8,7 +8,8 @@ export class ProductInOrderService {
                 user_id: dto.user_id,
                 order_id: dto.order_id,
                 product_id: dto.product_id,
-                count: dto.count
+                count: dto.count,
+                created_date: dto.created_date
             }
         })
     }

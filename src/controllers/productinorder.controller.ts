@@ -12,7 +12,7 @@ const productService = new ProductService()
 export class ProductInOrderController {
   async post(req: Request, res: Response) {
     const user_id = res.locals.payload.id
-    const { order_id, product_id, count } = req.body;
+    const { order_id, product_id, count, created_date } = req.body;
     try {
       const user_exsist = await userService.findById(+user_id)
       if(!user_exsist) {
@@ -32,7 +32,7 @@ export class ProductInOrderController {
               message: "Product not found by product_id: " + product_id
             })
           } else {
-            const productInOrder = await productInOrderService.create({ user_id, order_id, product_id, count });
+            const productInOrder = await productInOrderService.create({ user_id, order_id, product_id, count, created_date });
             res.status(201).json({
               message: "Product success created",
               productInOrder

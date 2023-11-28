@@ -1,5 +1,6 @@
 import prisma from "../database";
 import { OrderCreateModel, OrderUpdateModel } from "../models/order.model";
+import { Order } from "@prisma/client";
 
 export class OrderService {
     // done
@@ -21,7 +22,8 @@ export class OrderService {
             data: {
                 title: dto.title,
                 desc: dto.desc,
-                room_id: dto.room_id
+                room_id: dto.room_id,
+                user_id: dto.user_id
             }
         })
     }
@@ -38,15 +40,15 @@ export class OrderService {
         return await prisma.order.findUnique({ where: { id }})
     }
     // done
-    async findByUserId(user_id: number) {
+    async findByUser(user_id: number) {
         return await prisma.order.findMany({ where: { user_id }})
     }
     // done
-    async findByRoomId(room_id: number) {
+    async findByRoom(room_id: number) {
         return await prisma.order.findMany({ where: { room_id }})
     }
     // done
-    async findWaiterByStatus(user_id: number, status: number) {
+    async findByUserStatus(user_id: number, status: number) {
         return await prisma.order.findMany({ where: { user_id, status }})
     }
     // done
@@ -58,11 +60,11 @@ export class OrderService {
         return await prisma.order.findMany({ where: { status, room_id }})
     }
     // done
-    async findWaiterByRoomId(user_id: number, room_id: number) {
+    async findByUserRoom(user_id: number, room_id: number) {
         return await prisma.order.findMany({ where: { user_id, room_id }})
     }
     // done
-    async findWaiterByStatusAndRoomId(user_id: number, status: number, room_id: number) {
+    async findByUserStatusRoom(user_id: number, status: number, room_id: number) {
         return await prisma.order.findMany({ where: { user_id, status, room_id }})
     }
     // done

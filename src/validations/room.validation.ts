@@ -4,5 +4,5 @@ export const roomValidationSchema = Joi.object({
     name: Joi.string().required(),
     desc: Joi.string().required(),
     capacity: Joi.number().required(),
-    image: Joi.string().allow(null)
+    created_date: Joi.string().required()
   })

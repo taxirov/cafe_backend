@@ -1,26 +1,56 @@
+# env
 @url=http://localhost:4800/api
+@admin-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0IiwiaWF0IjoxNzAxMTM2NTQyLCJleHAiOjE3MDE3NDEzNDJ9.V7ySs380_bNpvJ4609h4NDqlieae2xWHfPfOs2lLE2o
+@admin-key=1234
+@waiter-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwibmFtZSI6IkJvYnVyIFRveGlyb3YiLCJ1c2VybmFtZSI6ImJvYnVyIiwicGhvbmUiOiIrOTk4OTE5MTIzMTg3IiwiaWF0IjoxNzAxMTM1NzI2LCJleHAiOjE3MDE3NDA1MjZ9.SvkZ-7NbWoaYsnVhK6NCGA72il8B4GjIkMUrV8jJkYA
 
+### test role apis
+# get all roles
+GET {{url}}/role
 ###
-GET {{url}}/user
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-
-###
-POST http://31.129.110.72:4800/api/user/register
+# post role
+POST {{url}}/role
+Admin-Key: {{admin-key}}
 Content-Type: application/json
-Admin-Key: Admin9204
+
+{ "name": "oshpaz" }
+
+###
+# put role
+PUT {{url}}/role/3
+Admin-Key: {{admin-key}}
+Content-Type: application/json
+
+{ "name": "chef"}
+###
+# delete role
+DELETE {{url}}/role/3
+Admin-Key: {{admin-key}}
+
+### check user apis
+# get all users
+GET {{url}}/user
+Access-Token: {{admin-token}}
+
+###
+# register user
+POST {{url}}/user/register
+Admin-Key: {{admin-key}}
+Content-Type: application/json
 
 {
-    "name": "Saad Takhir",
-    "username": "saadtakhir",
+    "name": "Bobur Toxirov",
+    "username": "bobur",
     "password": "Saad1234",
     "salary": 3000000,
-    "role_id": 1,
-    "phone": "+998905789204"
+    "role_id": 2,
+    "phone": "+998919123187",
+    "email": "saadtakhir1@gmail.com",
+    "joined_date": "24.11.2023T23:20:10Z"
 }
-
 ###
-
-POST http://localhost:4800/api/user/login
+# login user
+POST {{url}}/user/login
 Content-Type: application/json
 
 {
@@ -29,7 +59,35 @@ Content-Type: application/json
 }
 
 ###
+# get admin verify
+GET {{url}}/user/admin
+Admin-Key: {{admin-key}}
 
+###
+# get token verify
+GET {{url}}/user/verify
+Access-Token: {{waiter-token}}
+###
+# delete user
+DELETE {{url}}/user/6
+Admin-Key: {{admin-key}}
+Access-Token: {{admin-token}}
+###
+# put user
+PUT {{url}}/user/7
+Admin-Key: {{admin-key}}
+Access-Token: {{admin-token}}
+Content-Type: application/json
+
+{
+    "name": "Bobur Toxirov",
+    "username": "toxirov_bobur",
+    "salary": 5000000,
+    "role_id": 2,
+    "phone": "+998919123187",
+    "email": "toxirovbobur@gmail.com"
+}
+###
 GET {{url}}/productinorder?order_id=5
 Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
 
@@ -49,17 +107,19 @@ Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgV
 ###
 
 GET {{url}}/order
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
+Access-Token: {{admin-token}}
 
 ###
 
 POST http://localhost:4800/api/order
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6ImFkbWluIiwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNzAwNjcyNTMyLCJleHAiOjE3MDEyNzczMzJ9.R7_KoC1-VYVszPRtNkZTplC6h43gh56Af1evvJaziPY
+Access-Token: {{admin-token}}
 Content-Type: application/json
 
 {
     "title": "Order 1",
-    "room_id": 1
+    "room_id": 1,
+    "desc": "izoh",
+    "created_date": "27.11.2023T23:20:12.3Z"
 }
 
 ###
@@ -76,19 +136,21 @@ Admin-Key: 1234
 ###
 
 POST {{url}}/room
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
+Access-Token: {{admin-token}}
 Admin-Key: 1234
 Content-Type: application/json
 
 {
-    "name": "Zal 6",
+    "name": "Zal 1",
     "desc": "Xona haqida malumot",
-    "capacity": 40
+    "capacity": 40,
+    "created_date": "27.11.2023T23:20:12.3Z"
 }
 
 ###
 
-GET {{url}}/product
+GET {{url}}/room
+Access-Token: {{admin-token}}
 
 
 ###
