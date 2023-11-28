@@ -26,8 +26,8 @@ Content-Type: application/json
 # delete role
 DELETE {{url}}/role/3
 Admin-Key: {{admin-key}}
-
-### check user apis
+###
+---------------------------------------------------------------------------------------
 # get all users
 GET {{url}}/user
 Access-Token: {{admin-token}}
@@ -82,121 +82,139 @@ Content-Type: application/json
 {
     "name": "Bobur Toxirov",
     "username": "toxirov_bobur",
-    "salary": 5000000,
+    "salary": 6000000,
     "role_id": 2,
     "phone": "+998919123187",
     "email": "toxirovbobur@gmail.com"
 }
 ###
-GET {{url}}/productinorder?order_id=5
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-
+------------------------------------------------------------------------
 ###
-
-POST {{url}}/productinorder
+# get room
+GET {{url}}/room
+Access-Token: {{admin-token}}
+###
+# post room
+POST {{url}}/room
+Admin-Key: {{admin-key}}
+Access-Token: {{admin-token}}
 Content-Type: application/json
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
 
 {
-    "user_id": 1,
-    "order_id": 1,
-    "product_id": 1,
-    "count": 2
+    "name": "Zal 2",
+    "desc": "izoh zal 2",
+    "capacity": 30,
+    "created_date": "2023-11-28T21:55:17.418Z"
 }
-
 ###
-
-GET {{url}}/order
+# put room
+PUT {{url}}/room/2
+Admin-Key: {{admin-key}}
 Access-Token: {{admin-token}}
+Content-Type: application/json
 
+{
+    "name": "Zal 2",
+    "desc": "izoh zal 2",
+    "capacity": 10,
+    "created_date": "2023-11-28T21:55:17.418Z"
+}
+###
+# delete room
+DELETE {{url}}/room/2
+Admin-Key: {{admin-key}}
+Access-Token: {{admin-token}}
+###
+# get room by id
+GET {{url}}/room/1
+Access-Token: {{admin-token}}
 ###
 
-POST http://localhost:4800/api/order
+# get category
+GET {{url}}/category
+Access-Token: {{admin-token}}
+###
+# post category
+POST {{url}}/category
+Access-Token: {{admin-token}}
+Admin-Key: {{admin-key}}
+Content-Type: application/json
+
+{
+    "name": "Waters",
+    "desc": "izoh waters",
+    "created_date": "2023-11-28T21:55:17.418Z"
+}
+###
+# delete category
+DELETE {{url}}/category/1
+Admin-Key: {{admin-key}}
+###
+# put category
+PUT {{url}}/category/2
+Admin-Key: {{admin-key}}
+Content-Type: application/json
+
+{
+    "name": "Breads",
+    "desc": "izoh breads"
+}
+###
+----------------------------------------------------------------------------------
+###
+
+# get product
+GET {{url}}/product
+###
+# post product
+POST {{url}}/product
+Admin-Key: {{admin-key}}
+Content-Type: application/json
+
+{
+    "name": "fanta 0.5",
+    "category_id": 5,
+    "desc": "izoh cola 1.5",
+    "created_date": "2023-11-28T21:55:17.418Z",
+    "price": 6000
+}
+###
+# delete product
+DELETE {{url}}/product/2
+Admin-Key: {{admin-key}}
+###
+# put product
+PUT {{url}}/product/1
+Admin-Key: {{admin-key}}
+Content-Type: application/json
+
+{
+    "name": "fanta 0.5",
+    "category_id": 3,
+    "desc": "izoh cola 1.5",
+    "price": 6000
+}
+###
+
+# post order
+POST {{url}}/order
 Access-Token: {{admin-token}}
 Content-Type: application/json
 
 {
     "title": "Order 1",
-    "room_id": 1,
-    "desc": "izoh",
-    "created_date": "27.11.2023T23:20:12.3Z"
+    "desc": "order 1 izoh",
+    "room_id": null,
+    "created_date": "2023-11-28T21:55:17.418Z"
 }
-
 ###
-
-GET {{url}}/order
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6ImFkbWluIiwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNzAwNDEzOTk0LCJleHAiOjE3MDEwMTg3OTR9.kHBIPDbXXt9VABj_IBOydaBodHPyKvcdN0p3pmqoLTY
-
-###
-
-DELETE {{url}}/room/10
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-Admin-Key: 1234
-
-###
-
-POST {{url}}/room
-Access-Token: {{admin-token}}
-Admin-Key: 1234
+# put order
+PUT {{url}}/order/2
 Content-Type: application/json
-
-{
-    "name": "Zal 1",
-    "desc": "Xona haqida malumot",
-    "capacity": 40,
-    "created_date": "27.11.2023T23:20:12.3Z"
-}
-
-###
-
-GET {{url}}/room
 Access-Token: {{admin-token}}
 
-
+{ "title": "Order 3", "desc": "order 3 izoh", "user_id": 1, "room_id": null }
 ###
-
-POST {{url}}/order
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-Content-Type: application/json
-
-{
-    "title": "Zakaz 3",
-    "desc": null,
-    "room_id": 1,
-    "total_price": null
-}
-
-###
-
-PATCH {{url}}/order/3/status
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-Content-Type: application/json
-
-{
-    "status": false
-}
-
-###
-
-GET http://31.129.110.72:4800/api/product
-
-###
-
-GET {{url}}/productinorder
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1NTg5MjA0Iiwicm9sZV9pZCI6MSwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNjk5ODk4NzQ4LCJleHAiOjE3MDA1MDM1NDh9.zv2T2W_RrVzS8eg1UiU0bUILI_MpebdnsTC0NloLbQw
-
-###
-
-POST {{url}}/productinorder
-Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6ImFkbWluIiwic2FsYXJ5IjozMDAwMDAwLCJpbWFnZSI6bnVsbCwiaWF0IjoxNzAwNDEzOTk0LCJleHAiOjE3MDEwMTg3OTR9.kHBIPDbXXt9VABj_IBOydaBodHPyKvcdN0p3pmqoLTY
-Content-Type: application/json
-
-{
-    "order_id": 2,
-    "product_id": 3,
-    "count": 2
-}
-
-###
-GET {{url}}/role
-Admin-Key: 1234
+# get all order
+GET {{url}}/order/all
+Access-Token: {{admin-token}}

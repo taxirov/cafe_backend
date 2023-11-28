@@ -228,7 +228,7 @@ export class UserController {
           joined_date: user.joined_date
         }
         res.status(200).json({
-          message: "User datas success update",
+          message: "User data success update",
           user: user_res
         })
       }

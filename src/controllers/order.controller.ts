@@ -5,6 +5,7 @@ import { RoleService } from "../services/role.service";
 import { RoomService } from "../services/room.service";
 import { ProductService } from "../services/product.service";
 import { ProductInOrderService } from '../services/productinorder.service';
+import { Order } from '@prisma/client';
 
 const orderService = new OrderService();
 const userService = new UserService();
@@ -25,7 +26,7 @@ export type ProductInOrder = {
   update_date: string
 }
 
-export type Order = {
+export type OrderResponse = {
   id: number,
   title: string,
   desc: string | null,
@@ -58,7 +59,7 @@ export class OrderController {
           // create room object
           let room: { id: number, name: string } | null = null
           // create response order object
-          let order: Order = {
+          let order: OrderResponse = {
             id: order_created.id,
             title: order_created.title,
             desc: order_created.desc,
@@ -93,7 +94,7 @@ export class OrderController {
             // create room object
             let room: { id: number, name: string } | null = { id: room_order.id, name: room_order.name }
             // create response order object
-            let order: Order = {
+            let order: OrderResponse = {
               id: order_created.id,
               title: order_created.title,
               desc: order_created.desc,
@@ -113,6 +114,11 @@ export class OrderController {
     } catch (error) {
       res.status(500).json({ message: 'Error creating order' });
     }
+  }
+  // to do
+  private async getResOrders(orders: Order) {
+    let orders_response: OrderResponse[] = []
+    return orders_response
   }
   // done
   async put(req: Request, res: Response) {
@@ -166,7 +172,7 @@ export class OrderController {
             if (room_order) {
               room = { id: room_order.id, name: room_order.name }
               // create response order object
-              let order: Order = {
+              let order: OrderResponse = {
                 id: order_updated.id,
                 title: order_updated.title,
                 desc: order_updated.desc,
@@ -262,126 +268,116 @@ export class OrderController {
   }
   // to do
   // async get(req: Request, res: Response) {
-  //   const user = res.locals.payload
-  //   const { status_order, room_id } = req.query;
   //   try {
-  //     const user_role = await roleService.findByName(user.role)
-  //     if (user_role?.name === 'admin') {
-  //       // admin orders with status_order
-  //       if (status_order !== undefined && status_order !== '') {
-  //         const ordersAdmSta = await orderService.findByStatus(+status_order)
-  //         if (room_id !== undefined && room_id !== '') {
-  //           const ordersAdmStaRoom = await orderService.findByStatusRoom(+status_order, +room_id)
+  //     const user_id = res.locals.payload.id
+  //     const { status_order, room_id } = req.query;
+  //     const user_exsist = await userService.findById(+user_id)
+  //     if (user_exsist) {
+  //       const user_role = await roleService.findById(user_exsist.role_id)
+  //       if (user_role?.name === 'admin') {
+  //         // admin orders with status_order
+  //         if (status_order !== undefined && status_order !== '') {
+  //           const ordersAdmSta = await orderService.findByStatus(+status_order)
+  //           if (room_id !== undefined && room_id !== '') {
+  //             const ordersAdmStaRoom = await orderService.findByStatusRoom(+status_order, +room_id)
+  //             res.status(200).json({
+  //               message: "Orders by room_id: " + room_id + " and status_order: " + status_order,
+  //               orders: ordersAdmStaRoom
+  //             })
+  //           } else {
+  //             res.status(200).json({
+  //               message: "Orders by status_order: " + status_order,
+  //               orders: ordersAdmSta
+  //             })
+  //           }
+  //         }
+  //         // waiter orders with room_id
+  //         else if (room_id !== undefined && room_id !== '') {
+  //           const ordersAdmRoom = await orderService.findByRoomId(+room_id)
   //           res.status(200).json({
-  //             message: "Orders by room_id: " + room_id + " and status_order: " + status_order,
-  //             orders: ordersAdmStaRoom
+  //             message: "Orders by room_id: " + room_id,
+  //             orders: ordersAdmRoom
   //           })
-  //         } else {
+  //         }
+  //         // waiter orders
+  //         else {
+  //           const ordersAdm = await orderService.findAll()
+  //           // let orders: Order[] = []
+  //           //   for(let i = 0; i < order_created.length; i++) {
+  //           //       let user: { id: number, name: string }
+  //           //       $userStore.forEach(u => {
+  //           //           if(u.id == order_created[i].user_id) {
+  //           //               user = { id: u.id, name: u.name }
+  //           //           }
+  //           //       })
+  //           //       let room: { id: number, name: string }
+  //           //       $roomStore.forEach(r => {
+  //           //           if(r.id == order_created[i].room_id) {
+  //           //                room = { id: r.id, name: r.name}
+  //           //           }
+  //           //       })
+  //           //       products = await getProductInOrders(order_created[i].id)
+  //           //       let total_price: number = 0
+  //           //       for(let i = 0; i < products.length; i++) {
+  //           //           total_price += products[i].total_price
+  //           //       }
+  //           //       let order: Order = {
+  //           //           id: order_created[i].id,
+  //           //           title: order_created[i].title,
+  //           //           desc: order_created[i].desc,
+  //           //           user, room, products,
+  //           //           total_price,
+  //           //           status: order_created[i].status,
+  //           //           created_date: order_created[i].created_date,
+  //           //           update_date: order_created[i].update_date
+  //           //       }
+  //           //       orders.push(order)
+  //           //   }
   //           res.status(200).json({
-  //             message: "Orders by status_order: " + status_order,
-  //             orders: ordersAdmSta
+  //             message: "All orders",
+  //             orders: ordersAdm
   //           })
   //         }
   //       }
-  //       // waiter orders with room_id
-  //       else if (room_id !== undefined && room_id !== '') {
-  //         const ordersAdmRoom = await orderService.findByRoomId(+room_id)
-  //         res.status(200).json({
-  //           message: "Orders by room_id: " + room_id,
-  //           orders: ordersAdmRoom
-  //         })
-  //       }
-  //       // waiter orders
   //       else {
-  //         const ordersAdm = await orderService.findAll()
-  //         // let orders: Order[] = []
-  //         //   for(let i = 0; i < order_created.length; i++) {
-  //         //       let user: { id: number, name: string }
-  //         //       $userStore.forEach(u => {
-  //         //           if(u.id == order_created[i].user_id) {
-  //         //               user = { id: u.id, name: u.name }
-  //         //           }
-  //         //       })
-  //         //       let room: { id: number, name: string }
-  //         //       $roomStore.forEach(r => {
-  //         //           if(r.id == order_created[i].room_id) {
-  //         //                room = { id: r.id, name: r.name}
-  //         //           }
-  //         //       })
-  //         //       products = await getProductInOrders(order_created[i].id)
-  //         //       let total_price: number = 0
-  //         //       for(let i = 0; i < products.length; i++) {
-  //         //           total_price += products[i].total_price
-  //         //       }
-  //         //       let order: Order = {
-  //         //           id: order_created[i].id,
-  //         //           title: order_created[i].title,
-  //         //           desc: order_created[i].desc,
-  //         //           user, room, products,
-  //         //           total_price,
-  //         //           status: order_created[i].status,
-  //         //           created_date: order_created[i].created_date,
-  //         //           update_date: order_created[i].update_date
-  //         //       }
-  //         //       orders.push(order)
-  //         //   }
-  //         res.status(200).json({
-  //           message: "All orders",
-  //           orders: ordersAdm
-  //         })
-  //       }
-  //     }
-  //     else {
-  //       // waiter orders with status_order
-  //       if (status_order !== undefined && status_order !== '') {
-  //         const ordersWaiSta = await orderService.findWaiterByStatus(user.id, +status_order)
-  //         if (room_id !== undefined && room_id !== '') {
-  //           const ordersWaiStaRoom = await orderService.findWaiterByStatusAndRoomId(user.id, +status_order, +room_id)
+  //         // waiter orders with status_order
+  //         if (status_order !== undefined && status_order !== '') {
+  //           const ordersWaiSta = await orderService.findWaiterByStatus(user.id, +status_order)
+  //           if (room_id !== undefined && room_id !== '') {
+  //             const ordersWaiStaRoom = await orderService.findWaiterByStatusAndRoomId(user.id, +status_order, +room_id)
+  //             res.status(200).json({
+  //               message: "Orders by room_id: " + room_id + " and status_order: " + status_order,
+  //               orders: ordersWaiStaRoom
+  //             })
+  //           } else {
+  //             res.status(200).json({
+  //               message: "Orders by status_order: " + status_order,
+  //               orders: ordersWaiSta
+  //             })
+  //           }
+  //         }
+  //         // waiter orders with room_id
+  //         else if (room_id !== undefined && room_id !== '') {
+  //           const ordersWaiRoom = await orderService.findWaiterByRoomId(user.id, +room_id)
   //           res.status(200).json({
-  //             message: "Orders by room_id: " + room_id + " and status_order: " + status_order,
-  //             orders: ordersWaiStaRoom
-  //           })
-  //         } else {
-  //           res.status(200).json({
-  //             message: "Orders by status_order: " + status_order,
-  //             orders: ordersWaiSta
+  //             message: "Orders by room_id: " + room_id,
+  //             orders: ordersWaiRoom
   //           })
   //         }
-  //       }
-  //       // waiter orders with room_id
-  //       else if (room_id !== undefined && room_id !== '') {
-  //         const ordersWaiRoom = await orderService.findWaiterByRoomId(user.id, +room_id)
-  //         res.status(200).json({
-  //           message: "Orders by room_id: " + room_id,
-  //           orders: ordersWaiRoom
-  //         })
-  //       }
-  //       // waiter orders
-  //       else {
-  //         const ordersWai = await orderService.findByUserId(user.id)
-  //         res.status(200).json({
-  //           message: user.name + " orders",
-  //           orders: ordersWai
-  //         })
+  //         // waiter orders
+  //         else {
+  //           const ordersWai = await orderService.findByUserId(user.id)
+  //           res.status(200).json({
+  //             message: user.name + " orders",
+  //             orders: ordersWai
+  //           })
+  //         }
   //       }
   //     }
   //   } catch (error) {
   //     console.log(error)
   //   }
   // }
-  // done
-  async getAll(req: Request, res: Response) {
-    try {
-      const user = res.locals.payload
-      const orders = await orderService.findByUser(+user.id)
-      res.status(200).json({
-        message: "User all orders count",
-        orders_count: orders.length
-      })
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching orders count"})
-    }
-  }
   // to do
   // async patchStatus(req: Request, res: Response) {
   //   const { id } = req.params

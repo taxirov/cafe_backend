@@ -30,8 +30,9 @@ export class RoomController {
     try {
       const { id } = req.params;
       const { name, desc, capacity } = req.body;
-      const room = await roomService.update(+id, { name, desc, capacity });
-      if (room) {
+      const room_exsist = await roomService.findById(+id)
+      if (room_exsist) {
+        const room = await roomService.update(+id, { name, desc, capacity });
         res.status(200).json({
           message: "Room success updated",
           room
