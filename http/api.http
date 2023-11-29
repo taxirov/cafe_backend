@@ -2,7 +2,7 @@
 @url=http://localhost:4800/api
 @admin-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0IiwiaWF0IjoxNzAxMTM2NTQyLCJleHAiOjE3MDE3NDEzNDJ9.V7ySs380_bNpvJ4609h4NDqlieae2xWHfPfOs2lLE2o
 @admin-key=1234
-@waiter-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwibmFtZSI6IkJvYnVyIFRveGlyb3YiLCJ1c2VybmFtZSI6ImJvYnVyIiwicGhvbmUiOiIrOTk4OTE5MTIzMTg3IiwiaWF0IjoxNzAxMTM1NzI2LCJleHAiOjE3MDE3NDA1MjZ9.SvkZ-7NbWoaYsnVhK6NCGA72il8B4GjIkMUrV8jJkYA
+@waiter-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywibmFtZSI6IkJvYnVyIFRveGlyb3YiLCJ1c2VybmFtZSI6InRveGlyb3ZfYm9idXIiLCJwaG9uZSI6Iis5OTg5MTkxMjMxODciLCJpYXQiOjE3MDEyNTYwMzgsImV4cCI6MTcwMTg2MDgzOH0.s2ePM9K3tMEuq66nRt_-szqZgO-Ip_n8woVtcu2qa0c
 
 ### test role apis
 # get all roles
@@ -28,6 +28,7 @@ DELETE {{url}}/role/3
 Admin-Key: {{admin-key}}
 ###
 ---------------------------------------------------------------------------------------
+###
 # get all users
 GET {{url}}/user
 Access-Token: {{admin-token}}
@@ -54,7 +55,7 @@ POST {{url}}/user/login
 Content-Type: application/json
 
 {
-    "username": "saadtakhir",
+    "username": "toxirov_bobur",
     "password": "Saad1234"
 }
 
@@ -202,9 +203,9 @@ Access-Token: {{admin-token}}
 Content-Type: application/json
 
 {
-    "title": "Order 1",
-    "desc": "order 1 izoh",
-    "room_id": null,
+    "title": "Order 2",
+    "desc": "order 2 izoh",
+    "room_id": 1,
     "created_date": "2023-11-28T21:55:17.418Z"
 }
 ###
@@ -216,5 +217,35 @@ Access-Token: {{admin-token}}
 { "title": "Order 3", "desc": "order 3 izoh", "user_id": 1, "room_id": null }
 ###
 # get all order
-GET {{url}}/order/all
+DELETE {{url}}/order/2
 Access-Token: {{admin-token}}
+Admin-Key: {{admin-key}}
+###
+# get orders
+GET {{url}}/order
+Access-Token: {{admin-token}}
+###
+# patch order status
+PATCH {{url}}/order/4/status
+Access-Token: {{admin-token}}
+Content-Type: application/json
+
+{
+    "status": 0
+}
+###
+
+# get product in order
+GET {{url}}/productinorder
+Access-Token: {{admin-token}}
+###
+# post product in order
+POST {{url}}/productinorder
+Access-Token: {{admin-token}}
+Content-Type: application/json
+
+{
+    "order_id": 1,
+    "product_id": 3,
+    "count": 4
+}

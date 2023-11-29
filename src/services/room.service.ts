@@ -36,9 +36,17 @@ export class RoomService {
     async findAll() {
         return await prisma.room.findMany()
     }
-    // done
+    // done 
     async findById(id: number) {
-        return await prisma.room.findUnique({ where: { id } })
+        return await prisma.room.findUnique({ where: { id }})
+    }
+    // done
+    async findCustomById(room_id: number | null) {
+        if (room_id === null) {
+            return null
+        } else {
+            return await prisma.room.findUnique({ where: { id: room_id }, select: { id: true, name: true} })
+        }
     }
     // 
     async findByName(name: string) {

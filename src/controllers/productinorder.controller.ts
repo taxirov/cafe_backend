@@ -10,6 +10,7 @@ const userService = new UserService()
 const productService = new ProductService()
 
 export class ProductInOrderController {
+  // to do   
   async post(req: Request, res: Response) {
     const user_id = res.locals.payload.id
     const { order_id, product_id, count, created_date } = req.body;
@@ -44,7 +45,7 @@ export class ProductInOrderController {
       res.status(500).json({ error: 'Error creating ProductInOrder' });
     }
   }
-
+  // to do
   async put(req: Request, res: Response) {
     const { id } = req.params;
     const { product_id, count } = req.body;
@@ -62,7 +63,7 @@ export class ProductInOrderController {
       res.status(500).json({ error: 'Error updating ProductInOrder' });
     }
   }
-
+  // to do
   async delete(req: Request, res: Response) {
     const { id } = req.params;
     try {
@@ -79,7 +80,7 @@ export class ProductInOrderController {
       res.status(500).json({ error: 'Error deleting ProductInOrder' });
     }
   }
-
+  // to do
   async get(req: Request, res: Response) {
     const payload = res.locals.payload
     const { order_id } = req.query
@@ -121,10 +122,6 @@ export class ProductInOrderController {
     } catch (error) {
       res.status(500).json({ error: 'Error fetching ProductInOrder' });
     }
-  }
-
-  async getByProductId(req: Request, res: Response) {
-
   }
 }
 

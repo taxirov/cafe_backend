@@ -11,7 +11,7 @@ const orderController = new OrderController();
 router.post('/', validator.body(orderPostSchema), checkToken, orderController.post);
 router.put('/:id', validator.body(orderPutSchema), checkToken, orderController.put);
 router.delete('/:id', checkToken, checkAdmin,orderController.delete);
-// router.get('/', checkToken, orderController.get)
-// router.patch('/:id/status', checkToken, orderController.patchStatus)
+router.get('/', checkToken, orderController.get)
+router.patch('/:id/status', checkToken, orderController.patchStatus)
 
 export default router;
