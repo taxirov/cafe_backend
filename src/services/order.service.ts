@@ -76,3 +76,11 @@ export class OrderService {
         return await prisma.order.update({ where: { id }, data: { total_price }})
     }
 }
+
+const orderService = new  OrderService()
+let ans: Order[] = []
+async function findAll() {
+    ans = await orderService.findAll()
+}
+findAll()
+console.log(ans)

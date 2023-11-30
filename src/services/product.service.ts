@@ -33,6 +33,10 @@ export class ProductService {
         return await prisma.product.findUnique({ where: { id }})
     }
     // done
+    async findCustomById(id: number) {
+        return await prisma.product.findUnique({ where: { id }, select: { id: true, name: true, price: true, image: true }})
+    }
+    // done
     async findByName(name: string) {
         return await prisma.product.findUnique({ where: { name }})
     }

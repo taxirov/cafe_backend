@@ -1,8 +1,8 @@
 # env
 @url=http://localhost:4800/api
-@admin-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJzYWFkdGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0IiwiaWF0IjoxNzAxMTM2NTQyLCJleHAiOjE3MDE3NDEzNDJ9.V7ySs380_bNpvJ4609h4NDqlieae2xWHfPfOs2lLE2o
-@admin-key=1234
-@waiter-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywibmFtZSI6IkJvYnVyIFRveGlyb3YiLCJ1c2VybmFtZSI6InRveGlyb3ZfYm9idXIiLCJwaG9uZSI6Iis5OTg5MTkxMjMxODciLCJpYXQiOjE3MDEyNTYwMzgsImV4cCI6MTcwMTg2MDgzOH0.s2ePM9K3tMEuq66nRt_-szqZgO-Ip_n8woVtcu2qa0c
+@admin-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwibmFtZSI6IkJvYnVyIFRveGlyb3YiLCJ1c2VybmFtZSI6ImJvYnVyIiwicGhvbmUiOiIrOTk4OTE5MTIzMTg3IiwiaWF0IjoxNzAxMjc2MDYxLCJleHAiOjE3MDE4ODA4NjF9.3DFwUzO-TD65ZTEgnCpj6046c3oP9bHiiJdV_LUzOlk
+@admin-key=Admin9204
+@waiter-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwibmFtZSI6IlNhYWQgVGFraGlyIiwidXNlcm5hbWUiOiJ0YXhpcm92IiwicGhvbmUiOiIrOTk4OTE5MTIzMTg3IiwiaWF0IjoxNzAxMjgwMTkyLCJleHAiOjE3MDE4ODQ5OTJ9.3x10cyqX-qHq93Z4ej0V8bGM_v-His4Ede_koUgqED8
 
 ### test role apis
 # get all roles
@@ -13,7 +13,7 @@ POST {{url}}/role
 Admin-Key: {{admin-key}}
 Content-Type: application/json
 
-{ "name": "oshpaz" }
+{ "name": "waiter" }
 
 ###
 # put role
@@ -40,8 +40,8 @@ Admin-Key: {{admin-key}}
 Content-Type: application/json
 
 {
-    "name": "Bobur Toxirov",
-    "username": "bobur",
+    "name": "Saad Takhir",
+    "username": "taxirov",
     "password": "Saad1234",
     "salary": 3000000,
     "role_id": 2,
@@ -55,7 +55,7 @@ POST {{url}}/user/login
 Content-Type: application/json
 
 {
-    "username": "toxirov_bobur",
+    "username": "taxirov",
     "password": "Saad1234"
 }
 
@@ -173,8 +173,8 @@ Admin-Key: {{admin-key}}
 Content-Type: application/json
 
 {
-    "name": "fanta 0.5",
-    "category_id": 5,
+    "name": "fanta 1.5",
+    "category_id": 1,
     "desc": "izoh cola 1.5",
     "created_date": "2023-11-28T21:55:17.418Z",
     "price": 6000
@@ -203,26 +203,26 @@ Access-Token: {{admin-token}}
 Content-Type: application/json
 
 {
-    "title": "Order 2",
+    "title": "Order 23",
     "desc": "order 2 izoh",
-    "room_id": 1,
+    "room_id": null,
     "created_date": "2023-11-28T21:55:17.418Z"
 }
 ###
 # put order
-PUT {{url}}/order/2
+PUT {{url}}/order/1
 Content-Type: application/json
 Access-Token: {{admin-token}}
 
 { "title": "Order 3", "desc": "order 3 izoh", "user_id": 1, "room_id": null }
 ###
 # get all order
-DELETE {{url}}/order/2
+DELETE {{url}}/order/3
 Access-Token: {{admin-token}}
 Admin-Key: {{admin-key}}
 ###
 # get orders
-GET {{url}}/order
+GET {{url}}/order?status_order=1
 Access-Token: {{admin-token}}
 ###
 # patch order status
@@ -245,7 +245,19 @@ Access-Token: {{admin-token}}
 Content-Type: application/json
 
 {
-    "order_id": 1,
-    "product_id": 3,
-    "count": 4
+    "order_id": 4,
+    "product_id": 1,
+    "count": 2,
+    "created_date": "2023-11-28T21:55:17.418Z"
 }
+###
+# patch product in order status
+PATCH {{url}}/productinorder/4/status
+Access-Token: {{admin-token}}
+Content-Type: application/json
+
+{
+    "status": 1
+}
+###
+# delete pro

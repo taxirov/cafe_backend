@@ -62,12 +62,12 @@ model Order {
   desc         String?
   user_id      Int
   room_id      Int?
-  total_price  Int?
+  total_price  Int              @default(0)
   status       Int              @default(1)
   created_date String
   update_date  DateTime         @updatedAt
   user         User             @relation(references: [id], fields: [user_id])
-  room         Room?             @relation(references: [id], fields: [room_id])
+  room         Room?            @relation(references: [id], fields: [room_id])
   products     ProductInOrder[]
 }
 
@@ -77,6 +77,8 @@ model ProductInOrder {
   order_id     Int
   product_id   Int
   count        Int
+  status       Int      @default(0)
+  total_price  Int      @default(0)
   created_date String
   update_date  DateTime @updatedAt
   user         User     @relation(references: [id], fields: [user_id])
@@ -108,6 +110,6 @@ model Book {
   status       Int      @default(1)
   created_date String
   update_date  DateTime @updatedAt
-  room Room @relation(references: [id], fields: [room_id])
-  user User @relation(references: [id], fields: [user_id])
+  room         Room     @relation(references: [id], fields: [room_id])
+  user         User     @relation(references: [id], fields: [user_id])
 }

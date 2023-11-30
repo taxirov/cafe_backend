@@ -22,6 +22,7 @@ export type ProductInOrder = {
   product: { id: number, name: string, price: number, image: string | null },
   count: number,
   total_price: number,
+  status: number,
   created_date: string,
   update_date: string
 }
@@ -87,6 +88,7 @@ export class OrderController {
           } else {
             // create order
             const order_created = await orderService.create({ title, desc, user_id, room_id, created_date });
+            console.log(order_created)
             // create user object
             let user: { id: number, name: string } = { id: user_exsist.id, name: user_exsist.name }
             // update status room_exsist 
@@ -142,7 +144,8 @@ export class OrderController {
                 count: productInOrders[i].count,
                 total_price: productInOrders[i].count * product_pro.price,
                 created_date: productInOrders[i].created_date,
-                update_date: productInOrders[i].update_date.toString()
+                update_date: productInOrders[i].update_date.toString(),
+                status: productInOrders[i].status
               }
               products.push(product)
             }
@@ -216,7 +219,8 @@ export class OrderController {
                 count: productInOrders[i].count,
                 total_price: productInOrders[i].count * product_pro.price,
                 created_date: productInOrders[i].created_date,
-                update_date: productInOrders[i].update_date.toString()
+                update_date: productInOrders[i].update_date.toString(),
+                status: productInOrders[i].status
               }
               products.push(product)
             }
@@ -270,7 +274,7 @@ export class OrderController {
       const user_exsist = await userService.findById(+user_id)
       if (user_exsist) {
         const user_role = await roleService.findById(user_exsist.role_id);
-        if (user_role !== null && user_role.name === 'admin') {
+        if (user_role?.name === 'admin') {
           async function findAdminOrders(orders: Order[]) {
             let admin_orders: OrderResponse[] = []
             for (let i = 1; i < orders.length; i++) {
@@ -282,18 +286,19 @@ export class OrderController {
               let products: ProductInOrder[] = []
               const productInOrders = await proInOrService.findByOrderId(orders[i].id)
               for (let i = 0; i < productInOrders.length; i++) {
-                const user_pro = await userService.findById(productInOrders[i].user_id)
-                const product_pro = await productService.findById(productInOrders[i].product_id)
+                const user_pro = await userService.findCustomById(productInOrders[i].user_id)
+                const product_pro = await productService.findCustomById(productInOrders[i].product_id)
                 if (user_pro !== null && product_pro !== null) {
                   let product: ProductInOrder = {
                     id: productInOrders[i].id,
-                    user: { id: user_pro.id, name: user_pro.name },
+                    user: user_pro,
                     order_id: productInOrders[i].order_id,
-                    product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image },
+                    product: product_pro,
                     count: productInOrders[i].count,
                     total_price: productInOrders[i].count * product_pro.price,
                     created_date: productInOrders[i].created_date,
-                    update_date: productInOrders[i].update_date.toString()
+                    update_date: productInOrders[i].update_date.toString(),
+                    status: productInOrders[i].status
                   }
                   products.push(product)
                 }
@@ -302,7 +307,7 @@ export class OrderController {
                 id: orders[i].id,
                 title: orders[i].title,
                 desc: orders[i].desc,
-                user, room, products: [],
+                user, room, products,
                 total_price: orders[i].total_price,
                 status: orders[i].status,
                 created_date: orders[i].created_date,
@@ -347,7 +352,7 @@ export class OrderController {
               orders
             })
           }
-        } else if (user_role !== null && user_role.name === "waiter") {
+        } else {
           async function findWaiterOrders(orders: Order[]) {
             let waiter_orders: OrderResponse[] = []
             for (let i = 1; i < orders.length; i++) {
@@ -370,7 +375,8 @@ export class OrderController {
                     count: productInOrders[i].count,
                     total_price: productInOrders[i].count * product_pro.price,
                     created_date: productInOrders[i].created_date,
-                    update_date: productInOrders[i].update_date.toString()
+                    update_date: productInOrders[i].update_date.toString(),
+                    status: productInOrders[i].status
                   }
                   products.push(product)
                 }
@@ -462,7 +468,8 @@ export class OrderController {
                 count: productInOrders[i].count,
                 total_price: productInOrders[i].count * product_pro.price,
                 created_date: productInOrders[i].created_date,
-                update_date: productInOrders[i].update_date.toString()
+                update_date: productInOrders[i].update_date.toString(),
+                status: productInOrders[i].status
               }
               products.push(product)
             }
