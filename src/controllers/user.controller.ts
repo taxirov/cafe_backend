@@ -14,8 +14,8 @@ type UserResponse = {
   salary: number,
   role: string | undefined,
   orders: number,
-  joined_date: string,
-  update_date: string
+  create_date: Date,
+  update_date: Date
 }
 
 const userService = new UserService();
@@ -26,12 +26,12 @@ export class UserController {
   // done
   async register(req: Request, res: Response) {
     try {
-      const { name, username, password, salary, role_id, phone, email, joined_date } = req.body;
+      const { name, username, password, salary, role_id, phone, email } = req.body;
       const user_exsist = await userService.findByUsername(username)
       if (user_exsist) {
         res.status(403).json({ message: "User already exsist with username: " + username })
       } else {
-        const user = await userService.create({ name, username, password, salary, role_id, phone, email, joined_date });
+        const user = await userService.create({ name, username, password, salary, role_id, phone, email });
         const role = await roleService.findById(role_id)
         const payload = {
           id: user.id,
@@ -50,7 +50,7 @@ export class UserController {
           orders: 0,
           image: user.image,
           role: role?.name,
-          joined_date: user.joined_date
+          create_date: user.create_date
         }
         res.status(200).json({
           message: "Register success",
@@ -92,7 +92,7 @@ export class UserController {
             orders: user_orders.length,
             image: user_exsist.image,
             role: role?.name,
-            joined_date: user_exsist.joined_date
+            create_date: user_exsist.create_date
           }
           res.status(200).json({
             message: "Login success",
@@ -113,7 +113,6 @@ export class UserController {
   }
   // done
   async getTokenVerify(req: Request, res: Response) {
-    const user = res.locals.payload
     res.status(200).json({
       message: "Verify success"
     })
@@ -147,8 +146,8 @@ export class UserController {
                 salary: users[i].salary,
                 role: role?.name,
                 orders: user_orders.length,
-                joined_date: users[i].joined_date,
-                update_date: users[i].update_date.toString()
+                create_date: user_orders[i].create_date,
+                update_date: users[i].update_date
               })
             }
             res.status(200).json({
@@ -187,8 +186,8 @@ export class UserController {
           salary: user_deleted.salary,
           image: user_deleted.image,
           orders: user_orders.length,
-          joined_date: user_deleted.joined_date.toString(),
-          update_date: user_deleted.update_date.toString()
+          create_date: user_deleted.create_date,
+          update_date: user_deleted.update_date
         }
         res.status(200).json({
           message: "User already deleted by id: " + id,
@@ -225,7 +224,7 @@ export class UserController {
           orders: user_orders.length,
           image: user.image,
           role: role?.name,
-          joined_date: user.joined_date
+          create_date: user.create_date
         }
         res.status(200).json({
           message: "User data success update",

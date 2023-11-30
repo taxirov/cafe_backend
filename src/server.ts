@@ -1,9 +1,8 @@
 import dotenv from "dotenv";
-dotenv.config()
-
+dotenv.config();
 import express from "express";
 import cors from "cors";
-
+import swaggerDocs from './swagger';
 // routes
 import userRoutes from "./routes/user.routes";
 import categoryRoutes from "./routes/category.routes";
@@ -12,17 +11,19 @@ import roleRoutes from "./routes/role.routes";
 import orderRoutes from "./routes/order.routes";
 import roomRoutes from "./routes/room.routes";
 import productInOrderRoutes from "./routes/productinorder.routes";
-import { createRoleAdmin } from "./middlewares/user.middleware";
-
 // create role admin
-createRoleAdmin()
+import { createRoleAdmin } from "./middlewares/user.middleware";
+createRoleAdmin();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = +process.env.PORT! || 3000;
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}))
+
+// Initialize Swagger documentation
+swaggerDocs(app, port);
 
 app.use('/api/user', userRoutes)
 app.use('/api/category', categoryRoutes)

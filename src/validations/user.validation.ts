@@ -7,8 +7,7 @@ export const userValidationSchemaRegister = Joi.object({
     salary: Joi.number().required(),
     role_id: Joi.number().required(),
     phone: Joi.string().required(),
-    email: Joi.string().required(),
-    joined_date: Joi.string().required()
+    email: Joi.string().required()
 })
 
 export const userValidationSchemaLogin = Joi.object({

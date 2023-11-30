@@ -3,5 +3,4 @@ export type PrInOrServiceModel = {
     order_id: number
     product_id: number
     count: number
-    created_date: string
 }
