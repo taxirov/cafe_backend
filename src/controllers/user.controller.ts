@@ -123,11 +123,13 @@ export class UserController {
       message: "Verify success"
     })
   }
-  // done
   async getAll(req: Request, res: Response) {
     try {
-      const user = await userService.findById(res.locals.payload.id)
-      if (user) {
+      const user_id: number = res.locals.payload.id
+      const user = await userService.findById(user_id)
+      if (!user) {
+        res.status(404).json({ message: "User not found" })
+      } else {
         const role = await roleService.findById(user.role_id)
         if (role) {
           if (role.name === "admin") {
@@ -146,7 +148,7 @@ export class UserController {
                 salary: users[i].salary,
                 role: role?.name,
                 orders: user_orders.length,
-                create_date: user_orders[i].create_date,
+                create_date: users[i].create_date,
                 update_date: users[i].update_date
               })
             }
@@ -157,13 +159,14 @@ export class UserController {
           } else {
             res.status(401).json({ message: "You are not admin"})
           }
-        }
+        } else {
+          res.status(404).json({ message: "Role not found" })
+        }   
       }
     } catch (error) {
       res.status(500).json({ error: 'Error getting users' })
     }
   }
-  // done
   async delete(req: Request, res: Response) {
     const { id } = req.params
     try {

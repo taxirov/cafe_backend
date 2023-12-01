@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+import proccess from "process"
 import express from "express";
 import cors from "cors";
 import swaggerDocs from './swagger';
