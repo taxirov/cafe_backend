@@ -17,17 +17,16 @@ export type ProductInOrderRes = {
   product: { id: number, name: string, price: number, image: string | null },
   count: number,
   total_price: number,
-  created_date: string,
+  create_date: string,
   update_date: string,
   status: number
 }
 
 export class ProductInOrderController {
-  // done  
   async post(req: Request, res: Response) {
     try {
       const user_id = res.locals.payload.id;
-      const { order_id, product_id, count, created_date } = req.body;
+      const { order_id, product_id, count } = req.body;
       const user_exsist = await userService.findById(+user_id)
       if (!user_exsist) {
         res.status(404).json({
@@ -47,7 +46,7 @@ export class ProductInOrderController {
             })
           } else {
             const order = await orderService.findById(+order_id)
-            const productInOrder = await productInOrderService.create({ user_id, order_id, product_id, count, created_date });
+            const productInOrder = await productInOrderService.create({ user_id, order_id, product_id, count });
             const product = await productService.findCustomById(+product_id)
             const user = await userService.findCustomById(user_exsist.id)
             if (order !== null && product !== null && user !== null) {
@@ -61,7 +60,7 @@ export class ProductInOrderController {
                 count: proInOrder_updated.count,
                 total_price: proInOrder_updated.total_price,
                 status: proInOrder_updated.status,
-                created_date: proInOrder_updated.created_date,
+                create_date: proInOrder_updated.create_date.toString(),
                 update_date: proInOrder_updated.update_date.toString()
               }
               res.status(201).json({
@@ -76,7 +75,6 @@ export class ProductInOrderController {
       res.status(500).json({ message: 'Error creating Product In Order' });
     }
   }
-  // done
   async put(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -98,7 +96,7 @@ export class ProductInOrderController {
             count: productInOrder_updated.count,
             total_price: productInOrder_updated.total_price,
             status: productInOrder_updated.status,
-            created_date: productInOrder_updated.created_date,
+            create_date: productInOrder_updated.create_date.toString(),
             update_date: productInOrder_updated.update_date.toString()
           }
           res.status(200).json({
@@ -111,7 +109,6 @@ export class ProductInOrderController {
       res.status(500).json({ error: 'Error updating Product In Order' });
     }
   }
-  // done
   async delete(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -132,7 +129,7 @@ export class ProductInOrderController {
             count: productInOrder_deleted.count,
             total_price: productInOrder_deleted.total_price,
             status: productInOrder_deleted.status,
-            created_date: productInOrder_deleted.created_date,
+            create_date: productInOrder_deleted.create_date.toString(),
             update_date: productInOrder_deleted.update_date.toString()
           }
           res.status(201).json({
@@ -145,7 +142,6 @@ export class ProductInOrderController {
       res.status(500).json({ error: 'Error deleting Product In Order' });
     }
   }
-  // done
   async get(req: Request, res: Response) {
     try {
       const { order_id, product_id } = req.query
@@ -164,7 +160,7 @@ export class ProductInOrderController {
               count: productInOrders[i].count,
               total_price: productInOrders[i].total_price,
               status: productInOrders[i].status,
-              created_date: productInOrders[i].created_date,
+              create_date: productInOrders[i].create_date.toString(),
               update_date: productInOrders[i].update_date.toString()
             }
             productInOrdersRes.push(proInOrderRes)
@@ -228,7 +224,6 @@ export class ProductInOrderController {
       res.status(500).json({ error: 'Error fetching Product In Orders' });
     }
   }
-  // done
   async patchStatus(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -261,7 +256,7 @@ export class ProductInOrderController {
             count: proInOrder_updated.count,
             total_price: proInOrder_updated.total_price,
             status: proInOrder_updated.status,
-            created_date: proInOrder_updated.created_date,
+            create_date: proInOrder_updated.create_date.toString(),
             update_date: proInOrder_updated.update_date.toString()
           }
           res.status(201).json({

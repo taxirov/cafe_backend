@@ -11,7 +11,6 @@ const roomController = new RoomController();
 router.post('/', validator.body(roomValidationSchema), checkToken, checkAdmin, roomController.post);
 router.put('/:id', validator.body(roomValidationSchema), checkToken, checkAdmin, roomController.put);
 router.delete('/:id', checkToken, checkAdmin, roomController.delete);
-router.get('/:id', checkToken, roomController.getById);
-router.get('/', checkToken, roomController.get)
+router.get('/', checkToken, roomController.get);
 
 export default router;

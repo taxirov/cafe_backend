@@ -4,7 +4,6 @@ import { RoleService } from '../services/role.service';
 const roleService = new RoleService();
 
 export class RoleController {
-  // done
   async post(req: Request, res: Response) {
     try {
       const { name } = req.body;
@@ -25,7 +24,6 @@ export class RoleController {
       res.status(500).json({ error: 'Error creating role' });
     }
   }
-  // done
   async put(req: Request, res: Response) {
     const { id } = req.params;
     const { name } = req.body;
@@ -46,7 +44,6 @@ export class RoleController {
       res.status(500).json({ error: 'Error updating role' });
     }
   }
-  // done
   async delete(req: Request, res: Response) {
     const { id } = req.params
     try {
@@ -68,7 +65,6 @@ export class RoleController {
       })
     }
   }
-  // done
   async get(req: Request, res: Response) {
     try {
       const roles = await roleService.findAll();

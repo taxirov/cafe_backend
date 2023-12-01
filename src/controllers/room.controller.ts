@@ -4,10 +4,9 @@ import { RoomService } from '../services/room.service';
 const roomService = new RoomService();
 
 export class RoomController {
-  // done
   async post(req: Request, res: Response) {
     try {
-      const { name, desc, capacity, created_date } = req.body;
+      const { name, desc, capacity } = req.body;
       const room_exsist = await roomService.findByName(name)
       if (room_exsist) {
         res.status(403).json({
@@ -15,7 +14,7 @@ export class RoomController {
           room: room_exsist
         })
       } else {
-        const room = await roomService.create({ name, desc, capacity, created_date });
+        const room = await roomService.create({ name, desc, capacity });
         res.status(201).json({
           message: "Room success created",
           room
@@ -25,7 +24,6 @@ export class RoomController {
       res.status(500).json({ message: 'Error creating room' });
     }
   }
-  // done
   async put(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -44,7 +42,6 @@ export class RoomController {
       res.status(500).json({ message: 'Error updating room' });
     }
   }
-  // done
   async delete(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -62,7 +59,6 @@ export class RoomController {
       res.status(500).json({ message: 'Error deleting room' });
     }
   }
-  // done
   async get(req: Request, res: Response) {
     try {
       const { booked } = req.query;
@@ -91,24 +87,6 @@ export class RoomController {
       res.status(500).json({ message: 'Error fetching room' });
     }
   }
-  // done
-  async getById(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const room = await roomService.findById(+id);
-      if (room) {
-        res.status(200).json({
-          message: "Room by id: " + id,
-          room
-        });
-      } else {
-        res.status(404).json({ message: 'Room not found' });
-      }
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching room' });
-    }
-  }
-  // done
   async patchBooked(req: Request, res: Response) {
     try {
       const { id } = req.params;

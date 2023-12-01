@@ -10,8 +10,7 @@ export class OrderService {
                 title: dto.title,
                 desc: dto.desc,
                 user_id: dto.user_id,
-                room_id: dto.room_id,
-                created_date: dto.created_date
+                room_id: dto.room_id
             }
         })
     }

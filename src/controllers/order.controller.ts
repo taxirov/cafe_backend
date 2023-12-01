@@ -23,7 +23,7 @@ export type ProductInOrder = {
   count: number,
   total_price: number,
   status: number,
-  created_date: string,
+  create_date: string,
   update_date: string
 }
 
@@ -36,16 +36,15 @@ export type OrderResponse = {
   products: ProductInOrder[],
   total_price: number | null,
   status: number,
-  created_date: string,
+  create_date: string,
   update_date: string
 }
 
 export class OrderController {
-  // done
   async post(req: Request, res: Response) {
     try {
       const user_id = res.locals.payload.id;
-      const { title, desc, room_id, created_date } = req.body;
+      const { title, desc, room_id } = req.body;
       const user_exsist = await userService.findById(+user_id)
       if (!user_exsist) {
         res.status(404).json({
@@ -54,7 +53,7 @@ export class OrderController {
       } else {
         if (room_id === null) {
           // create order
-          const order_created = await orderService.create({ title, desc, user_id, room_id, created_date });
+          const order_created = await orderService.create({ title, desc, user_id, room_id });
           // create user object
           let user: { id: number, name: string } = { id: user_exsist.id, name: user_exsist.name }
           // create room object
@@ -67,7 +66,7 @@ export class OrderController {
             user, room, products: [],
             total_price: order_created.total_price,
             status: order_created.status,
-            created_date: order_created.created_date,
+            create_date: order_created.create_date.toString(),
             update_date: order_created.update_date.toString()
           }
           res.status(201).json({
@@ -87,7 +86,7 @@ export class OrderController {
             })
           } else {
             // create order
-            const order_created = await orderService.create({ title, desc, user_id, room_id, created_date });
+            const order_created = await orderService.create({ title, desc, user_id, room_id });
             console.log(order_created)
             // create user object
             let user: { id: number, name: string } = { id: user_exsist.id, name: user_exsist.name }
@@ -103,7 +102,7 @@ export class OrderController {
               user, room, products: [],
               total_price: 0,
               status: order_created.status,
-              created_date: order_created.created_date,
+              create_date: order_created.create_date.toString(),
               update_date: order_created.update_date.toString()
             }
             res.status(201).json({
@@ -117,7 +116,6 @@ export class OrderController {
       res.status(500).json({ message: 'Error creating order' });
     }
   }
-  // done
   async put(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -143,7 +141,7 @@ export class OrderController {
                 product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image },
                 count: productInOrders[i].count,
                 total_price: productInOrders[i].count * product_pro.price,
-                created_date: productInOrders[i].created_date,
+                create_date: productInOrders[i].create_date.toString(),
                 update_date: productInOrders[i].update_date.toString(),
                 status: productInOrders[i].status
               }
@@ -161,7 +159,7 @@ export class OrderController {
               user, room, products: [],
               total_price: order_updated.total_price,
               status: order_updated.status,
-              created_date: order_updated.created_date,
+              create_date: order_updated.create_date.toString(),
               update_date: order_updated.update_date.toString()
             }
             res.status(201).json({ message: "Order success updated", order })
@@ -177,7 +175,7 @@ export class OrderController {
                 user, room: room, products,
                 total_price: order_updated.total_price,
                 status: order_updated.status,
-                created_date: order_updated.created_date,
+                create_date: order_updated.create_date.toString(),
                 update_date: order_updated.update_date.toString()
               }
               res.status(201).json({
@@ -193,7 +191,6 @@ export class OrderController {
       res.status(500).json({ message: 'Error updating order' });
     }
   }
-  // done
   async delete(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -218,7 +215,7 @@ export class OrderController {
                 product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image },
                 count: productInOrders[i].count,
                 total_price: productInOrders[i].count * product_pro.price,
-                created_date: productInOrders[i].created_date,
+                create_date: productInOrders[i].create_date.toString(),
                 update_date: productInOrders[i].update_date.toString(),
                 status: productInOrders[i].status
               }
@@ -236,7 +233,7 @@ export class OrderController {
               user, room, products: [],
               total_price: order_deleted.total_price,
               status: order_deleted.status,
-              created_date: order_deleted.created_date,
+              create_date: order_deleted.create_date.toString(),
               update_date: order_deleted.update_date.toString()
             }
             res.status(201).json({ message: "Order success deleted", order })
@@ -252,7 +249,7 @@ export class OrderController {
                 user, room: room, products,
                 total_price: order_deleted.total_price,
                 status: order_deleted.status,
-                created_date: order_deleted.created_date,
+                create_date: order_deleted.create_date.toString(),
                 update_date: order_deleted.update_date.toString()
               }
               const room_free = await roomService.updateBooked(room.id, false)
@@ -266,7 +263,6 @@ export class OrderController {
       res.status(500).json({ message: 'Error deleting order' });
     }
   }
-  // done
   async get(req: Request, res: Response) {
     try {
       const user_id = res.locals.payload.id
@@ -296,7 +292,7 @@ export class OrderController {
                     product: product_pro,
                     count: productInOrders[i].count,
                     total_price: productInOrders[i].count * product_pro.price,
-                    created_date: productInOrders[i].created_date,
+                    create_date: productInOrders[i].create_date.toString(),
                     update_date: productInOrders[i].update_date.toString(),
                     status: productInOrders[i].status
                   }
@@ -310,7 +306,7 @@ export class OrderController {
                 user, room, products,
                 total_price: orders[i].total_price,
                 status: orders[i].status,
-                created_date: orders[i].created_date,
+                create_date: orders[i].create_date.toString(),
                 update_date: orders[i].update_date.toString()
               }
               admin_orders.push(order)
@@ -374,7 +370,7 @@ export class OrderController {
                     product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image },
                     count: productInOrders[i].count,
                     total_price: productInOrders[i].count * product_pro.price,
-                    created_date: productInOrders[i].created_date,
+                    create_date: productInOrders[i].create_date.toString(),
                     update_date: productInOrders[i].update_date.toString(),
                     status: productInOrders[i].status
                   }
@@ -388,7 +384,7 @@ export class OrderController {
                 user, room, products: [],
                 total_price: orders[i].total_price,
                 status: orders[i].status,
-                created_date: orders[i].created_date,
+                create_date: orders[i].create_date.toString(),
                 update_date: orders[i].update_date.toString()
               }
               waiter_orders.push(order)
@@ -437,7 +433,6 @@ export class OrderController {
       res.status(500).json({ message: "Error getting orders", error })
     }
   }
-  // done
   async patchStatus(req: Request, res: Response) {
     try {
       const { id } = req.params
@@ -467,7 +462,7 @@ export class OrderController {
                 product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image },
                 count: productInOrders[i].count,
                 total_price: productInOrders[i].count * product_pro.price,
-                created_date: productInOrders[i].created_date,
+                create_date: productInOrders[i].create_date.toString(),
                 update_date: productInOrders[i].update_date.toString(),
                 status: productInOrders[i].status
               }
@@ -483,7 +478,7 @@ export class OrderController {
             user, room, products,
             total_price: order_updated.total_price,
             status: order_updated.status,
-            created_date: order_updated.created_date,
+            create_date: order_updated.create_date.toString(),
             update_date: order_updated.update_date.toString()
           }
           if (room) {

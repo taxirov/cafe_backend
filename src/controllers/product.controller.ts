@@ -6,10 +6,9 @@ const productService = new ProductService();
 const categoryService = new CategoryService();
 
 export class ProductController {
-  // done
   async post(req: Request, res: Response) {
     try {
-      const { name, price, category_id, desc, created_date } = req.body;
+      const { name, price, category_id, desc } = req.body;
       const product_exsist = await productService.findByName(name)
       if (product_exsist) {
         res.status(403).json({
@@ -23,7 +22,7 @@ export class ProductController {
             message: "Category not found by id: " + category_id
           })
         } else {
-          const product = await productService.create({ name, price, category_id, desc, created_date });
+          const product = await productService.create({ name, price, category_id, desc });
           res.status(201).json({
             message: "Product success created",
             product
@@ -34,7 +33,6 @@ export class ProductController {
       res.status(500).json({ message: 'Error creating product' });
     }
   }
-  // done
   async put(req: Request, res: Response) {
     try {
       const { id } = req.params
@@ -60,7 +58,6 @@ export class ProductController {
       res.status(500).json({ message: 'Error updating product' });
     }
   }
-  // done
   async delete(req: Request, res: Response) {
     try {
       const { id } = req.params
@@ -78,7 +75,6 @@ export class ProductController {
       res.status(500).json({ message: 'Error deleting product' });
     }
   }
-  // done
   async getById(req: Request, res: Response) {
     try {
       const { id } = req.params
@@ -95,7 +91,6 @@ export class ProductController {
       res.status(500).json({ message: 'Error fetching product' });
     }
   }
-  // done
   async get(req: Request, res: Response) {
     try {
       const { category_id } = req.query

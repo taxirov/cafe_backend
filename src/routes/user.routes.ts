@@ -9,7 +9,6 @@ const validator = createValidator();
 const userController = new UserController()
 
 router.post('/register', validator.body(userValidationSchemaRegister), checkAdmin, userController.register)
-
 router.get('/', checkToken, userController.getAll)
 router.post('/login', userController.login)
 router.get('/verify', checkToken, userController.getTokenVerify)

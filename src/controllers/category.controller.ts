@@ -4,17 +4,16 @@ import { CategoryService } from "../services/category.service";
 const categoryService = new CategoryService();
 
 export class CategoryController {
-  // done
   async post(req: Request, res: Response) {
     try {
-      const { name, desc, created_date } = req.body;
+      const { name, desc } = req.body;
       const exsist_category = await categoryService.findByName(name);
       if (exsist_category) {
         res.status(403).json({
           message: "Category already exsist"
         })
       } else {
-        const category = await categoryService.create({ name, desc, created_date });
+        const category = await categoryService.create({ name, desc });
         res.status(201).json({
           message: "Category created",
           category
@@ -24,7 +23,6 @@ export class CategoryController {
       res.status(500).json({ message: 'Error creating category' });
     }
   }
-  // done
   async get(req: Request, res: Response) {
     try {
       const categories = await categoryService.findAll()
@@ -36,7 +34,6 @@ export class CategoryController {
       res.status(500).json({ message: "Error getting categories" })
     }
   }
-  // done
   async delete(req: Request, res: Response) {
     const { id } = req.params
     try {
@@ -58,7 +55,6 @@ export class CategoryController {
       })
     }
   }
-  // done
   async put(req: Request, res: Response) {
     try {
       const { id } = req.params
