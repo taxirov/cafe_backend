@@ -18,12 +18,18 @@ type UserResponse = {
   update_date: Date
 }
 
+export type Payload = {
+  id: number,
+  name: string,
+  username: string,
+  phone: string
+}
+
 const userService = new UserService();
 const roleService = new RoleService();
 const orderService = new OrderService();
 
 export class UserController {
-  // done
   async register(req: Request, res: Response) {
     try {
       const { name, username, password, salary, role_id, phone, email } = req.body;
@@ -33,14 +39,14 @@ export class UserController {
       } else {
         const user = await userService.create({ name, username, password, salary, role_id, phone, email });
         const role = await roleService.findById(role_id)
-        const payload = {
+        const payload: Payload = {
           id: user.id,
           name: user.name,
           username: user.username,
           phone: user.phone
         }
         const token = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: "7d" })
-        const user_res = {
+        const user_res: UserResponse = {
           id: user.id,
           name: user.name,
           username: user.username,
@@ -50,7 +56,8 @@ export class UserController {
           orders: 0,
           image: user.image,
           role: role?.name,
-          create_date: user.create_date
+          create_date: user.create_date,
+          update_date: user.update_date
         }
         res.status(200).json({
           message: "Register success",
@@ -61,8 +68,7 @@ export class UserController {
     } catch (error) {
       res.status(500).json({ error: 'Error creating user' });
     }
-  };
-  // done
+  }
   async login(req: Request, res: Response) {
     try {
       const { username, password } = req.body;
@@ -74,15 +80,15 @@ export class UserController {
       } else {
         if (password === user_exsist.password) {
           const role = await roleService.findById(user_exsist.role_id)
-          const payload = {
+          const payload: Payload = {
             id: user_exsist.id,
             name: user_exsist.name,
             username: user_exsist.username,
             phone: user_exsist.phone
           }
           const token = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: "7d" })
-          const user_orders = await orderService.findByUser(user_exsist.id)
-          const user_res = {
+          const user_orders = await orderService.findByUser(user_exsist.id, 1, 10000)
+          const user_res: UserResponse = {
             id: user_exsist.id,
             name: user_exsist.name,
             username: user_exsist.username,
@@ -92,7 +98,8 @@ export class UserController {
             orders: user_orders.length,
             image: user_exsist.image,
             role: role?.name,
-            create_date: user_exsist.create_date
+            create_date: user_exsist.create_date,
+            update_date: user_exsist.update_date
           }
           res.status(200).json({
             message: "Login success",
@@ -111,13 +118,11 @@ export class UserController {
       })
     }
   }
-  // done
   async getTokenVerify(req: Request, res: Response) {
     res.status(200).json({
       message: "Verify success"
     })
   }
-  // done
   async getAdminVerify(req: Request, res: Response) {
     res.status(200).json({
       message: "Verify success"
@@ -137,7 +142,7 @@ export class UserController {
             let users_res: UserResponse[] = []
             for (let i = 0; i < users.length; i++) {
               const role = await roleService.findById(users[i].role_id)
-              const user_orders = await orderService.findByUser(users[i].id)
+              const user_orders = await orderService.findByUser(users[i].id, 1, 10000)
               users_res.push({
                 id: users[i].id,
                 name: users[i].name,
@@ -168,8 +173,8 @@ export class UserController {
     }
   }
   async delete(req: Request, res: Response) {
-    const { id } = req.params
     try {
+      const { id } = req.params
       const user = await userService.findById(+id)
       if (!user) {
         res.status(404).json({
@@ -178,7 +183,7 @@ export class UserController {
       } else {
         const user_deleted = await userService.delete(+id)
         const role = await roleService.findById(user.role_id)
-        const user_orders = await orderService.findByUser(user_deleted.id)
+        const user_orders = await orderService.findByUser(user_deleted.id, 1, 10000)
         const user_res: UserResponse = {
           id: user_deleted.id,
           name: user_deleted.name,
@@ -203,7 +208,6 @@ export class UserController {
       })
     }
   }
-  // done
   async put(req: Request, res: Response) {
     try {
       const { id } = req.params
@@ -216,8 +220,8 @@ export class UserController {
       } else {
         const user = await userService.updateData(+id, name, username, phone, salary, email, role_id)
         const role = await roleService.findById(user.role_id)
-        const user_orders = await orderService.findByUser(user.id)
-        const user_res = {
+        const user_orders = await orderService.findByUser(user.id, 1, 10000)
+        const user_res: UserResponse = {
           id: user.id,
           name: user.name,
           username: user.username,
@@ -227,7 +231,8 @@ export class UserController {
           orders: user_orders.length,
           image: user.image,
           role: role?.name,
-          create_date: user.create_date
+          create_date: user.create_date,
+          update_date: user.update_date
         }
         res.status(200).json({
           message: "User data success update",

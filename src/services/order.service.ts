@@ -1,9 +1,7 @@
 import prisma from "../database";
 import { OrderCreateModel, OrderUpdateModel } from "../models/order.model";
-import { Order } from "@prisma/client";
 
 export class OrderService {
-    // done
     async create(dto: OrderCreateModel) {
         return await prisma.order.create({
             data: {
@@ -14,7 +12,6 @@ export class OrderService {
             }
         })
     }
-    // done
     async update(id: number, dto: OrderUpdateModel) {
         return await prisma.order.update({
             where: { id },
@@ -26,52 +23,62 @@ export class OrderService {
             }
         })
     }
-    // done
     async delete(id: number) {
-        return await prisma.order.delete({ where: { id }})
+        return await prisma.order.delete({ where: { id } })
     }
-    // done
     async findAll() {
         return await prisma.order.findMany()
     }
-    // done
+    async findAllByPagination(page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.order.findMany({ skip, take })
+    }
     async findById(id: number) {
-        return await prisma.order.findUnique({ where: { id }})
+        return await prisma.order.findUnique({ where: { id } })
     }
-    // done
-    async findByUser(user_id: number) {
-        return await prisma.order.findMany({ where: { user_id }})
+    async findByUser(user_id: number, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.order.findMany({ where: { user_id }, skip, take })
     }
-    // done
-    async findByRoom(room_id: number) {
-        return await prisma.order.findMany({ where: { room_id }})
+    async findByRoom(room_id: number, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.order.findMany({ where: { room_id }, skip, take })
     }
-    // done
     async findByUserStatus(user_id: number, status: number) {
         return await prisma.order.findMany({ where: { user_id, status }})
     }
-    // done
-    async findByStatus(status: number) {
-        return await prisma.order.findMany({ where: { status }})
+    async findByUserStatusPagination(user_id: number, status: number, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.order.findMany({ where: { user_id, status }, skip, take })
     }
-    // done
-    async findByStatusRoom(status: number, room_id: number) {
-        return await prisma.order.findMany({ where: { status, room_id }})
+    async findByStatus(status: number, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.order.findMany({ where: { status }, skip, take })
     }
-    // done
-    async findByUserRoom(user_id: number, room_id: number) {
-        return await prisma.order.findMany({ where: { user_id, room_id }})
+    async findByStatusRoom(status: number, room_id: number, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.order.findMany({ where: { status, room_id }, skip, take })
     }
-    // done
-    async findByUserStatusRoom(user_id: number, status: number, room_id: number) {
-        return await prisma.order.findMany({ where: { user_id, status, room_id }})
+    async findByUserRoom(user_id: number, room_id: number, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.order.findMany({ where: { user_id, room_id }, skip, take })
     }
-    // done
+    async findByUserStatusRoom(user_id: number, status: number, room_id: number, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.order.findMany({ where: { user_id, status, room_id }, skip, take })
+    }
     async updateStatus(id: number, status: number) {
         return await prisma.order.update({ where: { id }, data: { status }})
     }
-    // done
     async updateTotal(id: number, total_price: number) {
-        return await prisma.order.update({ where: { id }, data: { total_price }})
+        return await prisma.order.update({ where: { id }, data: { total_price } })
     }
 }

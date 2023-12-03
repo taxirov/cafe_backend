@@ -6,6 +6,7 @@ import { RoomService } from "../services/room.service";
 import { ProductService } from "../services/product.service";
 import { ProductInOrderService } from '../services/productinorder.service';
 import { Order, User } from '@prisma/client';
+import { Payload } from './user.controller';
 
 const orderService = new OrderService();
 const userService = new UserService();
@@ -265,14 +266,14 @@ export class OrderController {
   }
   async get(req: Request, res: Response) {
     try {
-      const user_id = res.locals.payload.id
-      const { status_order, room_id } = req.query;
-      const user_exsist = await userService.findById(+user_id)
+      const user: Payload = res.locals.payload
+      const { status_order, room_id, user_id, current_page, per_page } = req.query
+      const user_exsist = await userService.findById(user.id)
       if (user_exsist) {
         const user_role = await roleService.findById(user_exsist.role_id);
-        if (user_role?.name === 'admin') {
-          async function findAdminOrders(orders: Order[]) {
-            let admin_orders: OrderResponse[] = []
+        if (user_role !== null && user_role.name === 'admin') {
+          async function takeOrders(orders: Order[]) {
+            let orders_res: OrderResponse[] = []
             for (let i = 1; i < orders.length; i++) {
               // create user object
               let user: { id: number, name: string } | null = await userService.findCustomById(orders[i].user_id)
@@ -309,46 +310,210 @@ export class OrderController {
                 create_date: orders[i].create_date.toString(),
                 update_date: orders[i].update_date.toString()
               }
-              admin_orders.push(order)
-            } return admin_orders
+              orders_res.push(order)
+            } return orders_res
           }
-          // admin orders with status_order
-          if (status_order !== undefined && status_order !== '') {
-            const ordersAdmSta = await orderService.findByStatus(+status_order)
-            if (room_id !== undefined && room_id !== '') {
-              const ordersAdmStaRoom = await orderService.findByStatusRoom(+status_order, +room_id)
-              let orders: OrderResponse[] = await findAdminOrders(ordersAdmStaRoom)
-              res.status(200).json({
-                message: "Orders by room_id: " + room_id + " and status_order: " + status_order,
-                orders
-              })
-            } else {
-              let orders: OrderResponse[] = await findAdminOrders(ordersAdmSta)
-              res.status(200).json({
-                message: "Orders by status_order: " + status_order,
-                orders
-              })
+          const default_current_page = 1
+          const default_per_page = 12
+          let total_order_count = (await orderService.findAll()).length
+          let total_page_count: number = 1
+          if (total_order_count > default_per_page) {
+            total_page_count = Math.floor(total_order_count / default_per_page)
+            if (total_order_count % default_per_page > 0) {
+              total_page_count += 1
             }
           }
-          // admin orders with room_id
-          else if (room_id !== undefined && room_id !== '') {
-            const ordersAdmRoom = await orderService.findByRoom(+room_id)
-            let orders: OrderResponse[] = await findAdminOrders(ordersAdmRoom)
+          if (per_page !== undefined && current_page !== undefined && per_page !== '' && current_page !== '') {
+            // orders by status_order, room_id and user_id
+            if (status_order !== undefined && status_order !== '') {
+              if (room_id !== undefined && room_id !== '') {
+                if (user_id !== undefined && user_id !== '') {
+                  let orders_status_room_user = await orderService.findByUserStatusRoom(+user_id, +status_order, +room_id, +current_page, +per_page)
+                  let orders: OrderResponse[] = await takeOrders(orders_status_room_user)
+                  total_order_count = orders.length
+                  if (total_order_count > +per_page) {
+                    total_page_count = Math.floor(total_order_count / +per_page)
+                    if (total_order_count % (+per_page) > 0) {
+                      total_page_count += 1
+                    }
+                  }
+                  res.status(200).json({
+                    orders,
+                    status_order: +status_order,
+                    room_id: +room_id,
+                    user_id: +user_id,
+                    current_page: +current_page,
+                    per_page: +per_page,
+                    total_page_count,
+                    total_order_count
+                  })
+                } else {
+                  const orders_status_room = await orderService.findByStatusRoom(+status_order, +room_id, +current_page, +per_page)
+                  let orders: OrderResponse[] = await takeOrders(orders_status_room)
+                  total_order_count = orders.length
+                  if (total_order_count > +per_page) {
+                    total_page_count = Math.floor(total_order_count / +per_page)
+                    if (total_order_count % (+per_page) > 0) {
+                      total_page_count += 1
+                    }
+                  }
+                  res.status(200).json({
+                    orders,
+                    status_order: +status_order,
+                    room_id: +room_id,
+                    user_id: undefined,
+                    current_page: +current_page,
+                    per_page: +per_page,
+                    total_page_count,
+                    total_order_count
+                  })
+                }
+              } else {
+                const orders_status = await orderService.findByStatus(+status_order, +current_page, +per_page)
+                let orders: OrderResponse[] = await takeOrders(orders_status)
+                total_order_count = orders.length
+                if (total_order_count > +per_page) {
+                  total_page_count = Math.floor(total_order_count / +per_page)
+                  if (total_order_count % (+per_page) > 0) {
+                    total_page_count += 1
+                  }
+                }
+                res.status(200).json({
+                  orders,
+                  status_order: +status_order,
+                  room_id: undefined,
+                  user_id: undefined,
+                  current_page: +current_page,
+                  per_page: +per_page,
+                  total_page_count,
+                  total_order_count
+                })
+              }
+            }
+            // orders by room_id and user_id
+            else if (room_id !== undefined && room_id !== '') {
+              if (user_id !== undefined && user_id !== '') {
+                let orders_room_user = await orderService.findByUserRoom(+user_id, +room_id, +current_page, +per_page)
+                let orders: OrderResponse[] = await takeOrders(orders_room_user)
+                total_order_count = orders.length
+                if (total_order_count > +per_page) {
+                  total_page_count = Math.floor(total_order_count / +per_page)
+                  if (total_order_count % (+per_page) > 0) {
+                    total_page_count += 1
+                  }
+                }
+                res.status(200).json({
+                  orders,
+                  status_order: undefined,
+                  room_id: +room_id,
+                  user_id: +user_id,
+                  current_page: +current_page,
+                  per_page: +per_page,
+                  total_page_count,
+                  total_order_count
+                })
+              } else {
+                const orders_room = await orderService.findByRoom(+room_id, +current_page, +per_page)
+                let orders: OrderResponse[] = await takeOrders(orders_room)
+                total_order_count = orders.length
+                if (total_order_count > +per_page) {
+                  total_page_count = Math.floor(total_order_count / +per_page)
+                  if (total_order_count % (+per_page) > 0) {
+                    total_page_count += 1
+                  }
+                }
+                res.status(200).json({
+                  orders,
+                  status_order: undefined,
+                  room_id: +room_id,
+                  user_id: undefined,
+                  current_page: +current_page,
+                  per_page: +per_page,
+                  total_page_count,
+                  total_order_count
+                })
+              }
+            }
+            // orders by user_id
+            else if (user_id !== undefined && user_id !== '') {
+              let orders_user = await orderService.findByUser(+user_id, +current_page, +per_page)
+              let orders: OrderResponse[] = await takeOrders(orders_user)
+              total_order_count = orders.length
+              if (total_order_count > +per_page) {
+                total_page_count = Math.floor(total_order_count / +per_page)
+                if (total_order_count % (+per_page) > 0) {
+                  total_page_count += 1
+                }
+              }
+              res.status(200).json({
+                orders,
+                status_order: undefined,
+                room_id: undefined,
+                user_id: +user_id,
+                current_page: +current_page,
+                per_page: +per_page,
+                total_page_count,
+                total_order_count
+              })
+            }
+            // orders by pagination
+            else {
+              const orders_pag = await orderService.findAllByPagination(+current_page, +per_page)
+              let orders: OrderResponse[] = await takeOrders(orders_pag)
+              total_order_count = orders.length
+              if (total_order_count > +per_page) {
+                total_page_count = Math.floor(total_order_count / +per_page)
+                if (total_order_count % (+per_page) > 0) {
+                  total_page_count += 1
+                }
+              }
+              res.status(200).json({
+                orders,
+                status_order: undefined,
+                room_id: undefined,
+                user_id: undefined,
+                current_page: +current_page,
+                per_page: +per_page,
+                total_page_count,
+                total_order_count
+              })
+            }
+          } else {
+            const orders_default = await orderService.findAllByPagination(default_current_page, default_per_page)
+            let orders: OrderResponse[] = await takeOrders(orders_default)
+            total_order_count = orders.length
+            if (total_order_count > default_per_page) {
+              total_page_count = Math.floor(total_order_count / default_per_page)
+              if (total_order_count % default_per_page > 0) {
+                total_page_count += 1
+              }
+            }
             res.status(200).json({
-              message: "Orders by room_id: " + room_id,
-              orders
-            })
-          }
-          // admin orders
-          else {
-            const ordersAdm = await orderService.findAll()
-            let orders: OrderResponse[] = await findAdminOrders(ordersAdm)
-            res.status(200).json({
-              message: "All orders",
-              orders
+              orders,
+              status_order: undefined,
+              room_id: undefined,
+              user_id: undefined,
+              current_page: default_current_page,
+              per_page: default_per_page,
+              total_page_count,
+              total_order_count
             })
           }
         } else {
+          res.status(403).json({ message: "You are not admin, this endpoint only admins" })
+        }
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Error getting orders", error })
+    }
+  }
+  async getWaiter(req: Request, res: Response) {
+    try {
+      const user_id = +res.locals.payload.id
+      const user_exsist = await userService.findById(user_id)
+      if (user_exsist) {
+        const user_role = await roleService.findById(user_exsist.role_id)
+        if (user_role !== null && user_role.name === 'waiter') {
           async function findWaiterOrders(orders: Order[]) {
             let waiter_orders: OrderResponse[] = []
             for (let i = 1; i < orders.length; i++) {
@@ -391,43 +556,17 @@ export class OrderController {
             }
             return waiter_orders
           }
-          // waiter orders with status_order
-          if (status_order !== undefined && status_order !== '') {
-            const ordersWaiSta = await orderService.findByUserStatus(user_exsist.id, +status_order)
-            if (room_id !== undefined && room_id !== '') {
-              const ordersWaiStaRoom = await orderService.findByUserStatusRoom(user_exsist.id, +status_order, +room_id)
-              let orders: OrderResponse[] = await findWaiterOrders(ordersWaiStaRoom)
-              res.status(200).json({
-                message: "Orders by room_id: " + room_id + " and status_order: " + status_order,
-                orders
-              })
-            } else {
-              let orders: OrderResponse[] = await findWaiterOrders(ordersWaiSta)
-              res.status(200).json({
-                message: "Orders by status_order: " + status_order,
-                orders
-              })
-            }
-          }
-          // waiter orders with room_id
-          else if (room_id !== undefined && room_id !== '') {
-            const ordersWaiRoom = await orderService.findByUserRoom(user_exsist.id, +room_id)
-            let orders: OrderResponse[] = await findWaiterOrders(ordersWaiRoom)
-            res.status(200).json({
-              message: "Orders by room_id: " + room_id,
-              orders
-            })
-          }
-          // waiter orders
-          else {
-            const ordersWai = await orderService.findByUser(user_exsist.id)
-            let orders: OrderResponse[] = await findWaiterOrders(ordersWai)
-            res.status(200).json({
-              message: user_exsist.name + " orders",
-              orders
-            })
-          }
+          const orders_waiter = await orderService.findByUserStatus(user_exsist.id, 1)
+          let orders: OrderResponse[] = await findWaiterOrders(orders_waiter)
+          res.status(200).json({
+            message: user_exsist.name + " orders",
+            orders
+          })
+        } else {
+          res.status(403).json({ message: "You are not waiter, this endpoint only waiters" })
         }
+      } else {
+        res.status(404).json({ message: "User not found" })
       }
     } catch (error) {
       res.status(500).json({ message: "Error getting orders", error })

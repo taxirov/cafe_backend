@@ -1,0 +1,10 @@
+@api="http://localhost:4300/api"
+
+###
+POST {{api}}/user/login
+Content-Type: application/json
+
+{
+    "username": "saadtakhir",
+    "password": "Saad1234"
+}

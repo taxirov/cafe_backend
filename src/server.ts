@@ -3,7 +3,7 @@ dotenv.config();
 import proccess from "process"
 import express from "express";
 import cors from "cors";
-import swaggerDocs from './swagger';
+// import swaggerDocs from './swagger';
 // routes
 import userRoutes from "./routes/user.routes";
 import categoryRoutes from "./routes/category.routes";
@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true}))
 
 // Initialize Swagger documentation
-swaggerDocs(app, port);
+// swaggerDocs(app, port);
 
 app.use('/api/user', userRoutes)
 app.use('/api/category', categoryRoutes)
