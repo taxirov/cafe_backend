@@ -9,7 +9,7 @@ const validator = createValidator();
 const categoryController = new CategoryController()
 
 router.post('/', checkAdmin, validator.body(categoryPostSchema), categoryController.post);
-router.get('/', checkToken, categoryController.get)
+router.get('/', categoryController.get)
 router.delete('/:id', checkAdmin, categoryController.delete)
 router.put('/:id', checkAdmin, validator.body(categoryPutSchema), categoryController.put);
 
