@@ -19,13 +19,9 @@ createRoleAdmin();
 const app = express();
 const port = +process.env.PORT! || 3000;
 
-
 app.use(cors({ origin: '*', methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}))
-
-// Initialize Swagger documentation
-// swaggerDocs(app, port);
 
 app.use('/api/user', userRoutes)
 app.use('/api/category', categoryRoutes)
