@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import proccess from "process"
 import express from "express";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 // import swaggerDocs from './swagger';
 // routes
 import userRoutes from "./routes/user.routes";
@@ -19,9 +19,8 @@ createRoleAdmin();
 const app = express();
 const port = +process.env.PORT! || 3000;
 
-app.use(cors({
-  origin: ["http://localhost:8080", "http://31.129.110.72:8080"]
-}));
+
+app.use(cors({ origin: '*', methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}))
 
