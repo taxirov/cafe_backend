@@ -30,21 +30,23 @@ export async function checkAdmin(req: Request, res: Response, next: NextFunction
             message: "Admin-Key is not provided"
         })
     } else {
-            if (admin_key === process.env.ADMIN_KEY) {
-                next()
-            } else {
-                res.status(401).json({
-                    message: "Admin-Key is incorrect"
-                })
-            }
+        if (admin_key === process.env.ADMIN_KEY) {
+            next()
+        } else {
+            res.status(401).json({
+                message: "Admin-Key is incorrect"
+            })
         }
-    
+    }
+
 }
 
-export async function createRoleAdmin() {
-    const role_exsist = await roleService.findByName('admin')
-    if(role_exsist === null) {
-        return await roleService.create('admin')          
+export async function createRoleAdminWaiter() {
+    const role_admin = await roleService.findByName('admin')
+    const role_waiter = await roleService.findByName('waiter')
+    if (role_admin === null && role_waiter === null) {
+        await roleService.create('waiter')
+        await roleService.create('admin')
     }
 }
 

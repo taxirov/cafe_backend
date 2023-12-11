@@ -13,8 +13,8 @@ import orderRoutes from "./routes/order.routes";
 import roomRoutes from "./routes/room.routes";
 import productInOrderRoutes from "./routes/productinorder.routes";
 // create role admin
-import { createRoleAdmin } from "./middlewares/user.middleware";
-createRoleAdmin();
+import { createRoleAdminWaiter } from "./middlewares/user.middleware";
+createRoleAdminWaiter();
 
 const app = express();
 const port = +process.env.PORT! || 3000;

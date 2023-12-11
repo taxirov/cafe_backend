@@ -21,6 +21,9 @@ export class UserService {
     async findById(id: number) {
         return await prisma.user.findUnique({ where: { id } })
     }
+    async findByRoleId(role_id: number) {
+        return await prisma.user.findMany({ where: { role_id } })
+    }
     async findCustomById(id: number) {
         return await prisma.user.findUnique({ where: { id }, select: { id: true, name: true} })
     }
@@ -39,10 +42,10 @@ export class UserService {
     async updatePassword(id: number, password: string) {
         return await prisma.user.update({ where: { id }, data: { password }})
     }
-    async updateData(id: number, name: string, username: string, phone: string, salary: number, email: string, role_id: number) {
+    async updateData(id: number, name: string, username: string, phone: string, salary: number, email: string, role_id: number, status: number) {
         return await prisma.user.update({
             where: { id },
-            data: { name, username, phone, salary, email, role_id }
+            data: { name, username, phone, salary, email, role_id, status }
         })
     }
     async delete(id: number) {
