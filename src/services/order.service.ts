@@ -1,5 +1,44 @@
 import prisma from "../database";
 import { OrderCreateModel, OrderUpdateModel } from "../models/order.model";
+import { Prisma } from "@prisma/client";
+
+const roomSelect: Prisma.RoomSelect = {
+    id: true,
+    name: true
+}
+const userSelect: Prisma.UserSelect = {
+    id: true,
+    name: true
+}
+const productSelect: Prisma.ProductSelect = {
+    id: true,
+    name: true,
+    price: true,
+    image: true,
+    category_id: true
+}
+const productInOrderSelect: Prisma.ProductInOrderSelect = {
+    id: true,
+    user: { select: userSelect },
+    order_id: true,
+    product: { select: productSelect },
+    count: true,
+    total_price: true,
+    status: true,
+    create_date: true,
+    update_date: true
+}
+const orderSelect: Prisma.OrderSelect = {
+    id: true,
+    title: true,
+    desc: true,
+    user: { select: userSelect },
+    room: { select: roomSelect },
+    total_price: true,
+    status: true,
+    create_date: true,
+    update_date: true
+}
 
 export class OrderService {
     async create(dto: OrderCreateModel) {
@@ -48,7 +87,7 @@ export class OrderService {
         return await prisma.order.findMany({ where: { room_id }, skip, take })
     }
     async findByUserStatus(user_id: number, status: number) {
-        return await prisma.order.findMany({ where: { user_id, status }})
+        return await prisma.order.findMany({ where: { user_id, status } })
     }
     async findByUserStatusPagination(user_id: number, status: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
@@ -76,9 +115,14 @@ export class OrderService {
         return await prisma.order.findMany({ where: { user_id, status, room_id }, skip, take })
     }
     async updateStatus(id: number, status: number) {
-        return await prisma.order.update({ where: { id }, data: { status }})
+        return await prisma.order.update({ where: { id }, data: { status } })
     }
     async updateTotal(id: number, total_price: number) {
         return await prisma.order.update({ where: { id }, data: { total_price } })
+    }
+    async findAllOrders() {
+        return await prisma.order.findMany({
+            select: orderSelect
+        })
     }
 }

@@ -3,24 +3,15 @@ import { ProductInOrderService } from '../services/productinorder.service';
 import { OrderService } from "../services/order.service";
 import { UserService } from "../services/user.service";
 import { ProductService } from "../services/product.service";
-import { ProductInOrder } from '@prisma/client';
+import { RoomService } from '../services/room.service';
+import { Order, ProductInOrder } from '@prisma/client';
+import type { OrderResponse, ProductInOrderResponse } from './order.controller';
 
 const productInOrderService = new ProductInOrderService();
 const orderService = new OrderService();
 const userService = new UserService();
 const productService = new ProductService();
-
-export type ProductInOrderRes = {
-  id: number,
-  user: { id: number, name: string }
-  order_id: number,
-  product: { id: number, name: string, price: number, image: string | null },
-  count: number,
-  total_price: number,
-  create_date: string,
-  update_date: string,
-  status: number
-}
+const roomService = new RoomService();
 
 export class ProductInOrderController {
   async post(req: Request, res: Response) {
@@ -45,14 +36,14 @@ export class ProductInOrderController {
               message: "Product not found by product_id: " + product_id
             })
           } else {
-            const order = await orderService.findById(+order_id)
             const productInOrder = await productInOrderService.create({ user_id, order_id, product_id, count });
+            const order = await orderService.findById(productInOrder.order_id)
             const product = await productService.findCustomById(+product_id)
             const user = await userService.findCustomById(user_exsist.id)
             if (order !== null && product !== null && user !== null) {
               // update product_in_product total price
               const proInOrder_updated = await productInOrderService.updateTotalPrice(productInOrder.id, product.price * productInOrder.count)
-              let proInOrderRes: ProductInOrderRes = {
+              let proInOrderRes: ProductInOrderResponse = {
                 id: proInOrder_updated.id,
                 user,
                 order_id: order.id,
@@ -60,13 +51,13 @@ export class ProductInOrderController {
                 count: proInOrder_updated.count,
                 total_price: proInOrder_updated.total_price,
                 status: proInOrder_updated.status,
-                create_date: proInOrder_updated.create_date.toString(),
-                update_date: proInOrder_updated.update_date.toString()
+                create_date: proInOrder_updated.create_date,
+                update_date: proInOrder_updated.update_date
               }
               res.status(201).json({
                 message: "Product In Order success created",
                 productInOrder: proInOrderRes
-              });
+              })
             }
           }
         }
@@ -78,30 +69,30 @@ export class ProductInOrderController {
   async put(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { order_id, product_id, count } = req.body;
+      const { product_id, count } = req.body;
       const productInOrder_exsist = await productInOrderService.findById(+id);
       if (!productInOrder_exsist) {
         res.status(404).json({ error: 'Product In Order not found' });
       } else {
-        const productInOrder_updated = await productInOrderService.update(productInOrder_exsist.id, +order_id, +product_id, +count);
+        const productInOrder_updated = await productInOrderService.update(productInOrder_exsist.id, +product_id, +count);
         const order = await orderService.findById(productInOrder_updated.order_id)
         const product = await productService.findCustomById(productInOrder_updated.product_id)
         const user = await userService.findCustomById(productInOrder_updated.user_id)
         if (order !== null && product !== null && user !== null) {
-          let proInOrderRes: ProductInOrderRes = {
+          let proInOrderRes: ProductInOrderResponse = {
             id: productInOrder_updated.id,
             user,
             order_id: order.id,
             product,
             count: productInOrder_updated.count,
-            total_price: productInOrder_updated.total_price,
+            total_price: productInOrder_updated.count * product.price,
             status: productInOrder_updated.status,
-            create_date: productInOrder_updated.create_date.toString(),
-            update_date: productInOrder_updated.update_date.toString()
+            create_date: productInOrder_updated.create_date,
+            update_date: productInOrder_updated.update_date
           }
           res.status(200).json({
             message: "Product In Order success updated",
-            productInOrder: proInOrderRes
+            productInOrder: proInOrderRes,
           });
         }
       }
@@ -121,7 +112,7 @@ export class ProductInOrderController {
         const product = await productService.findCustomById(productInOrder_deleted.product_id)
         const user = await userService.findCustomById(productInOrder_deleted.user_id)
         if (order !== null && product !== null && user !== null) {
-          let proInOrderRes: ProductInOrderRes = {
+          let proInOrderRes: ProductInOrderResponse = {
             id: productInOrder_deleted.id,
             user,
             order_id: order.id,
@@ -129,8 +120,8 @@ export class ProductInOrderController {
             count: productInOrder_deleted.count,
             total_price: productInOrder_deleted.total_price,
             status: productInOrder_deleted.status,
-            create_date: productInOrder_deleted.create_date.toString(),
-            update_date: productInOrder_deleted.update_date.toString()
+            create_date: productInOrder_deleted.create_date,
+            update_date: productInOrder_deleted.update_date
           }
           res.status(201).json({
             message: "Product In Order success deleted",
@@ -146,13 +137,13 @@ export class ProductInOrderController {
     try {
       const { order_id, product_id } = req.query
       async function findProductInOrders(productInOrders: ProductInOrder[]) {
-        let productInOrdersRes: ProductInOrderRes[] = []
+        let productInOrdersRes: ProductInOrderResponse[] = []
         for (let i = 0; i < productInOrders.length; i++) {
           const order = await orderService.findById(productInOrders[i].order_id)
           const product = await productService.findCustomById(productInOrders[i].product_id)
           const user = await userService.findCustomById(productInOrders[i].user_id)
           if (order !== null && product !== null && user !== null) {
-            let proInOrderRes: ProductInOrderRes = {
+            let proInOrderRes: ProductInOrderResponse = {
               id: productInOrders[i].id,
               user,
               order_id: order.id,
@@ -160,8 +151,8 @@ export class ProductInOrderController {
               count: productInOrders[i].count,
               total_price: productInOrders[i].total_price,
               status: productInOrders[i].status,
-              create_date: productInOrders[i].create_date.toString(),
-              update_date: productInOrders[i].update_date.toString()
+              create_date: productInOrders[i].create_date,
+              update_date: productInOrders[i].update_date
             }
             productInOrdersRes.push(proInOrderRes)
           }
@@ -198,27 +189,27 @@ export class ProductInOrderController {
             })
           }
         }
-      } else if(product_id !== undefined && product_id !== '') {
-          const product = await productService.findById(+product_id)
-          if (!product) {
-            res.status(404).json({
-              message: "Product not found by id: " + product_id
-            })
-          } else {
-            const productInOrders = await productInOrderService.findByProductId(product.id)
-            const pro_res = await findProductInOrders(productInOrders)
-            res.status(200).json({
-              message: "Prouct In Orders by product_id: " + product_id,
-              productInOrders: pro_res
-            })
-          }
+      } else if (product_id !== undefined && product_id !== '') {
+        const product = await productService.findById(+product_id)
+        if (!product) {
+          res.status(404).json({
+            message: "Product not found by id: " + product_id
+          })
+        } else {
+          const productInOrders = await productInOrderService.findByProductId(product.id)
+          const pro_res = await findProductInOrders(productInOrders)
+          res.status(200).json({
+            message: "Prouct In Orders by product_id: " + product_id,
+            productInOrders: pro_res
+          })
+        }
       } else {
         const productInOrders = await productInOrderService.findAll()
-            const pro_res = await findProductInOrders(productInOrders)
-            res.status(200).json({
-              message: "All Prouct In Orders",
-              productInOrders: pro_res
-            })
+        const pro_res = await findProductInOrders(productInOrders)
+        res.status(200).json({
+          message: "All Prouct In Orders",
+          productInOrders: pro_res
+        })
       }
     } catch (error) {
       res.status(500).json({ error: 'Error fetching Product In Orders' });
@@ -248,7 +239,7 @@ export class ProductInOrderController {
             total_price_order = order_product.total_price - proInOrder_updated.total_price
           }
           const order_pro_updated = await orderService.updateTotal(order_product.id, total_price_order)
-          let proInOrderRes: ProductInOrderRes = {
+          let proInOrderRes: ProductInOrderResponse = {
             id: proInOrder_updated.id,
             user,
             order_id: order_pro_updated.id,
@@ -256,8 +247,8 @@ export class ProductInOrderController {
             count: proInOrder_updated.count,
             total_price: proInOrder_updated.total_price,
             status: proInOrder_updated.status,
-            create_date: proInOrder_updated.create_date.toString(),
-            update_date: proInOrder_updated.update_date.toString()
+            create_date: proInOrder_updated.create_date,
+            update_date: proInOrder_updated.update_date
           }
           res.status(201).json({
             message: "Product status success updated",

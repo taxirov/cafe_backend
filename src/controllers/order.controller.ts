@@ -15,30 +15,39 @@ const roomService = new RoomService();
 const productService = new ProductService()
 const proInOrService = new ProductInOrderService()
 
+type UserCustom = { id: number, name: string };
+type ProductCustom = { 
+  id: number, 
+  name: string, 
+  price: number, 
+  image: string | null, 
+  category_id: number 
+};
+type RoomCustom = { id: number, name: string }
 
-export type ProductInOrder = {
+export type ProductInOrderResponse = {
   id: number,
-  user: { id: number, name: string }
+  user: UserCustom
   order_id: number,
-  product: { id: number, name: string, price: number, image: string | null },
+  product: ProductCustom,
   count: number,
   total_price: number,
   status: number,
-  create_date: string,
-  update_date: string
+  create_date: Date,
+  update_date: Date
 }
 
 export type OrderResponse = {
   id: number,
   title: string,
   desc: string | null,
-  user: { id: number, name: string } | null,
-  room: { id: number, name: string } | null,
-  products: ProductInOrder[],
+  user: UserCustom,
+  room: RoomCustom | null,
+  products: ProductInOrderResponse[],
   total_price: number | null,
   status: number,
-  create_date: string,
-  update_date: string
+  create_date: Date,
+  update_date: Date
 }
 
 export class OrderController {
@@ -67,8 +76,8 @@ export class OrderController {
             user, room, products: [],
             total_price: order_created.total_price,
             status: order_created.status,
-            create_date: order_created.create_date.toString(),
-            update_date: order_created.update_date.toString()
+            create_date: order_created.create_date,
+            update_date: order_created.update_date
           }
           res.status(201).json({
             message: "Order success created",
@@ -88,7 +97,6 @@ export class OrderController {
           } else {
             // create order
             const order_created = await orderService.create({ title, desc, user_id, room_id });
-            console.log(order_created)
             // create user object
             let user: { id: number, name: string } = { id: user_exsist.id, name: user_exsist.name }
             // update status room_exsist 
@@ -103,8 +111,8 @@ export class OrderController {
               user, room, products: [],
               total_price: 0,
               status: order_created.status,
-              create_date: order_created.create_date.toString(),
-              update_date: order_created.update_date.toString()
+              create_date: order_created.create_date,
+              update_date: order_created.update_date
             }
             res.status(201).json({
               message: "Order success created",
@@ -129,21 +137,21 @@ export class OrderController {
           // create user object
           let user: { id: number, name: string } = { id: user_order.id, name: user_order.name }
           // create products array
-          let products: ProductInOrder[] = []
+          let products: ProductInOrderResponse[] = []
           const productInOrders = await proInOrService.findByOrderId(order_updated.id)
           for (let i = 0; i < productInOrders.length; i++) {
             const user_pro = await userService.findById(productInOrders[i].user_id)
             const product_pro = await productService.findById(productInOrders[i].product_id)
             if (user_pro !== null && product_pro !== null) {
-              let product: ProductInOrder = {
+              let product: ProductInOrderResponse = {
                 id: productInOrders[i].id,
                 user: { id: user_pro.id, name: user_pro.name },
                 order_id: productInOrders[i].order_id,
-                product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image },
+                product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image, category_id: product_pro.category_id },
                 count: productInOrders[i].count,
                 total_price: productInOrders[i].count * product_pro.price,
-                create_date: productInOrders[i].create_date.toString(),
-                update_date: productInOrders[i].update_date.toString(),
+                create_date: productInOrders[i].create_date,
+                update_date: productInOrders[i].update_date,
                 status: productInOrders[i].status
               }
               products.push(product)
@@ -160,8 +168,8 @@ export class OrderController {
               user, room, products: [],
               total_price: order_updated.total_price,
               status: order_updated.status,
-              create_date: order_updated.create_date.toString(),
-              update_date: order_updated.update_date.toString()
+              create_date: order_updated.create_date,
+              update_date: order_updated.update_date
             }
             res.status(201).json({ message: "Order success updated", order })
           } else {
@@ -176,8 +184,8 @@ export class OrderController {
                 user, room: room, products,
                 total_price: order_updated.total_price,
                 status: order_updated.status,
-                create_date: order_updated.create_date.toString(),
-                update_date: order_updated.update_date.toString()
+                create_date: order_updated.create_date,
+                update_date: order_updated.update_date
               }
               res.status(201).json({
                 message: "Order success updated",
@@ -203,21 +211,21 @@ export class OrderController {
           // create user object
           let user: { id: number, name: string } = { id: user_order.id, name: user_order.name }
           // create products array
-          let products: ProductInOrder[] = []
+          let products: ProductInOrderResponse[] = []
           const productInOrders = await proInOrService.findByOrderId(order_deleted.id)
           for (let i = 0; i < productInOrders.length; i++) {
             const user_pro = await userService.findById(productInOrders[i].user_id)
             const product_pro = await productService.findById(productInOrders[i].product_id)
             if (user_pro !== null && product_pro !== null) {
-              let product: ProductInOrder = {
+              let product: ProductInOrderResponse = {
                 id: productInOrders[i].id,
                 user: { id: user_pro.id, name: user_pro.name },
                 order_id: productInOrders[i].order_id,
-                product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image },
+                product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image, category_id: product_pro.category_id },
                 count: productInOrders[i].count,
                 total_price: productInOrders[i].count * product_pro.price,
-                create_date: productInOrders[i].create_date.toString(),
-                update_date: productInOrders[i].update_date.toString(),
+                create_date: productInOrders[i].create_date,
+                update_date: productInOrders[i].update_date,
                 status: productInOrders[i].status
               }
               products.push(product)
@@ -234,8 +242,8 @@ export class OrderController {
               user, room, products: [],
               total_price: order_deleted.total_price,
               status: order_deleted.status,
-              create_date: order_deleted.create_date.toString(),
-              update_date: order_deleted.update_date.toString()
+              create_date: order_deleted.create_date,
+              update_date: order_deleted.update_date
             }
             res.status(201).json({ message: "Order success deleted", order })
           } else {
@@ -250,8 +258,8 @@ export class OrderController {
                 user, room: room, products,
                 total_price: order_deleted.total_price,
                 status: order_deleted.status,
-                create_date: order_deleted.create_date.toString(),
-                update_date: order_deleted.update_date.toString()
+                create_date: order_deleted.create_date,
+                update_date: order_deleted.update_date
               }
               const room_free = await roomService.updateBooked(room.id, false)
               res.status(201).json({ message: "Order success deleted", order });
@@ -274,27 +282,27 @@ export class OrderController {
         if (user_role !== null && user_role.name === 'admin') {
           async function takeOrders(orders: Order[]) {
             let orders_res: OrderResponse[] = []
-            for (let i = 1; i < orders.length; i++) {
+            for (let i = 0; i < orders.length; i++) {
               // create user object
-              let user: { id: number, name: string } | null = await userService.findCustomById(orders[i].user_id)
+              let user: { id: number, name: string } = (await userService.findCustomById(orders[i].user_id))!
               // create room object
               let room: { id: number, name: string } | null = await roomService.findCustomById(orders[i].room_id)
               // create products list
-              let products: ProductInOrder[] = []
+              let products: ProductInOrderResponse[] = []
               const productInOrders = await proInOrService.findByOrderId(orders[i].id)
               for (let i = 0; i < productInOrders.length; i++) {
                 const user_pro = await userService.findCustomById(productInOrders[i].user_id)
                 const product_pro = await productService.findCustomById(productInOrders[i].product_id)
                 if (user_pro !== null && product_pro !== null) {
-                  let product: ProductInOrder = {
+                  let product: ProductInOrderResponse = {
                     id: productInOrders[i].id,
                     user: user_pro,
                     order_id: productInOrders[i].order_id,
                     product: product_pro,
                     count: productInOrders[i].count,
                     total_price: productInOrders[i].count * product_pro.price,
-                    create_date: productInOrders[i].create_date.toString(),
-                    update_date: productInOrders[i].update_date.toString(),
+                    create_date: productInOrders[i].create_date,
+                    update_date: productInOrders[i].update_date,
                     status: productInOrders[i].status
                   }
                   products.push(product)
@@ -307,8 +315,8 @@ export class OrderController {
                 user, room, products,
                 total_price: orders[i].total_price,
                 status: orders[i].status,
-                create_date: orders[i].create_date.toString(),
-                update_date: orders[i].update_date.toString()
+                create_date: orders[i].create_date,
+                update_date: orders[i].update_date
               }
               orders_res.push(order)
             } return orders_res
@@ -511,32 +519,28 @@ export class OrderController {
     try {
       const user_id = +res.locals.payload.id
       const user_exsist = await userService.findById(user_id)
-      if (user_exsist) {
+      if (user_exsist !== null) {
         const user_role = await roleService.findById(user_exsist.role_id)
-        if (user_role !== null && user_role.name === 'waiter') {
-          async function findWaiterOrders(orders: Order[]) {
-            let waiter_orders: OrderResponse[] = []
-            for (let i = 1; i < orders.length; i++) {
-              // create user object
-              let user: { id: number, name: string } | null = await userService.findCustomById(orders[i].user_id)
-              // create room object
-              let room: { id: number, name: string } | null = await roomService.findCustomById(orders[i].room_id)
+        if (user_role !== null && user_role.name == 'waiter') {
+          async function findWaiterOrders( orders: Order[], user: User) {
+            const waiter_orders: OrderResponse[] = []
+            for (let i = 0; i < orders.length; i++) {
               // create products list
-              let products: ProductInOrder[] = []
+              const products: ProductInOrderResponse[] = []
               const productInOrders = await proInOrService.findByOrderId(orders[i].id)
               for (let i = 0; i < productInOrders.length; i++) {
                 const user_pro = await userService.findById(productInOrders[i].user_id)
                 const product_pro = await productService.findById(productInOrders[i].product_id)
                 if (user_pro !== null && product_pro !== null) {
-                  let product: ProductInOrder = {
+                  let product: ProductInOrderResponse = {
                     id: productInOrders[i].id,
                     user: { id: user_pro.id, name: user_pro.name },
                     order_id: productInOrders[i].order_id,
                     product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image },
                     count: productInOrders[i].count,
                     total_price: productInOrders[i].count * product_pro.price,
-                    create_date: productInOrders[i].create_date.toString(),
-                    update_date: productInOrders[i].update_date.toString(),
+                    create_date: productInOrders[i].create_date,
+                    update_date: productInOrders[i].update_date,
                     status: productInOrders[i].status
                   }
                   products.push(product)
@@ -546,18 +550,20 @@ export class OrderController {
                 id: orders[i].id,
                 title: orders[i].title,
                 desc: orders[i].desc,
-                user, room, products: [],
+                user: { id: user.id, name: user.name},
+                room: await roomService.findCustomById(orders[i].room_id),
+                products,
                 total_price: orders[i].total_price,
                 status: orders[i].status,
-                create_date: orders[i].create_date.toString(),
-                update_date: orders[i].update_date.toString()
+                create_date: orders[i].create_date,
+                update_date: orders[i].update_date
               }
               waiter_orders.push(order)
             }
             return waiter_orders
           }
           const orders_waiter = await orderService.findByUserStatus(user_exsist.id, 1)
-          let orders: OrderResponse[] = await findWaiterOrders(orders_waiter)
+          let orders: OrderResponse[] = await findWaiterOrders(orders_waiter, user_exsist)
           res.status(200).json({
             message: user_exsist.name + " orders",
             orders
@@ -588,21 +594,21 @@ export class OrderController {
           // create user object
           let user: { id: number, name: string } = { id: user_order.id, name: user_order.name }
           // create products array
-          let products: ProductInOrder[] = []
+          let products: ProductInOrderResponse[] = []
           const productInOrders = await proInOrService.findByOrderId(order_updated.id)
           for (let i = 0; i < productInOrders.length; i++) {
             const user_pro = await userService.findById(productInOrders[i].user_id)
             const product_pro = await productService.findById(productInOrders[i].product_id)
             if (user_pro !== null && product_pro !== null) {
-              let product: ProductInOrder = {
+              let product: ProductInOrderResponse = {
                 id: productInOrders[i].id,
                 user: { id: user_pro.id, name: user_pro.name },
                 order_id: productInOrders[i].order_id,
                 product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image },
                 count: productInOrders[i].count,
                 total_price: productInOrders[i].count * product_pro.price,
-                create_date: productInOrders[i].create_date.toString(),
-                update_date: productInOrders[i].update_date.toString(),
+                create_date: productInOrders[i].create_date,
+                update_date: productInOrders[i].update_date,
                 status: productInOrders[i].status
               }
               products.push(product)
@@ -617,8 +623,8 @@ export class OrderController {
             user, room, products,
             total_price: order_updated.total_price,
             status: order_updated.status,
-            create_date: order_updated.create_date.toString(),
-            update_date: order_updated.update_date.toString()
+            create_date: order_updated.create_date,
+            update_date: order_updated.update_date
           }
           if (room) {
             await roomService.updateBooked(room.id, false)
