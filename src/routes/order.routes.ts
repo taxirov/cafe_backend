@@ -10,7 +10,7 @@ const orderController = new OrderController();
 
 router.post('/', validator.body(orderPostSchema), checkToken, orderController.post);
 router.put('/:id', validator.body(orderPutSchema), checkToken, orderController.put);
-router.delete('/:id', checkToken, checkAdmin,orderController.delete);
+router.delete('/:id', checkToken, checkAdmin, orderController.delete);
 router.get('/', validator.query(orderGetSchema), checkToken, orderController.get)
 router.get('/waiter', checkToken, orderController.getWaiter)
 router.patch('/:id/status', checkToken, orderController.patchStatus)

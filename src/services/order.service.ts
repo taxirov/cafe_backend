@@ -63,7 +63,7 @@ export class OrderService {
         })
     }
     async delete(id: number) {
-        return await prisma.order.delete({ where: { id } })
+        return await prisma.order.delete({ where: { id }, select: orderSelect })
     }
     async findAll() {
         return await prisma.order.findMany()
@@ -86,8 +86,10 @@ export class OrderService {
         let take: number = limit;
         return await prisma.order.findMany({ where: { room_id }, skip, take })
     }
-    async findByUserStatus(user_id: number, status: number) {
-        return await prisma.order.findMany({ where: { user_id, status } })
+    async findCustomByUserStatus(user_id: number, status: number, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.order.findMany({ where: { user_id, status }, select: orderSelect, skip, take })
     }
     async findByUserStatusPagination(user_id: number, status: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;

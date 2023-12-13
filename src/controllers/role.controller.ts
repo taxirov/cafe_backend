@@ -5,12 +5,12 @@ import { UserService } from '../services/user.service';
 const roleService = new RoleService();
 const userService = new UserService();
 
-export type RoleResponse = { 
+export type RoleResponse = {
   id: number,
   name: string,
   users: number,
-  create_date: string,
-  update_date: string
+  create_date: Date,
+  update_date: Date
 }
 
 export class RoleController {
@@ -26,13 +26,13 @@ export class RoleController {
       } else {
         const role = await roleService.create(name);
         const users = await userService.findByRoleId(role.id)
-          let role_response: RoleResponse = {
-            id: role.id,
-            name: role.name,
-            users: users.length,
-            create_date: role.create_date.toString(),
-            update_date: role.updated_date.toString()
-          }
+        let role_response: RoleResponse = {
+          id: role.id,
+          name: role.name,
+          users: users.length,
+          create_date: role.create_date,
+          update_date: role.updated_date
+        }
         res.status(201).json({
           message: "Role success created",
           role: role_response
@@ -54,13 +54,13 @@ export class RoleController {
       } else {
         const role = await roleService.updateName(+id, name);
         const users = await userService.findByRoleId(role.id)
-          let role_response: RoleResponse = {
-            id: role.id,
-            name: role.name,
-            users: users.length,
-            create_date: role.create_date.toString(),
-            update_date: role.updated_date.toString()
-          }
+        let role_response: RoleResponse = {
+          id: role.id,
+          name: role.name,
+          users: users.length,
+          create_date: role.create_date,
+          update_date: role.updated_date
+        }
         res.status(200).json({
           message: "Role data success updated",
           role: role_response
@@ -81,13 +81,13 @@ export class RoleController {
       } else {
         const role = await roleService.delete(+id);
         const users = await userService.findByRoleId(role.id)
-          let role_response: RoleResponse = {
-            id: role.id,
-            name: role.name,
-            users: users.length,
-            create_date: role.create_date.toString(),
-            update_date: role.updated_date.toString()
-          }
+        let role_response: RoleResponse = {
+          id: role.id,
+          name: role.name,
+          users: users.length,
+          create_date: role.create_date,
+          update_date: role.updated_date
+        }
         res.status(200).json({
           message: "Role already deleted",
           role: role_response
@@ -114,8 +114,8 @@ export class RoleController {
             id: roles[i].id,
             name: roles[i].name,
             users: users.length,
-            create_date: roles[i].create_date.toString(),
-            update_date: roles[i].updated_date.toString()
+            create_date: roles[i].create_date,
+            update_date: roles[i].updated_date
           }
           roles_response.push(role_response)
         }

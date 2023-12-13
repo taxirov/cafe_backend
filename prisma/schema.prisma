@@ -64,14 +64,14 @@ model Order {
   title       String
   desc        String?
   user_id     Int
-  room_id     Int?
+  room_id     Int?     
   total_price Int      @default(0)
   status      Int      @default(1)
   create_date DateTime @default(now())
   update_date DateTime @updatedAt
 
   user     User             @relation(references: [id], fields: [user_id], onDelete: Cascade, onUpdate: Cascade)
-  room     Room?            @relation(references: [id], fields: [room_id], onDelete: Cascade, onUpdate: Cascade)
+  room     Room?            @relation(references: [id], fields: [room_id], onDelete: SetNull, onUpdate: Cascade)
   products ProductInOrder[]
 }
 

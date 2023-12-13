@@ -33,14 +33,15 @@ export class ProductInOrderService {
                 order_id: dto.order_id,
                 product_id: dto.product_id,
                 count: dto.count
-            }
+            },
+            select: productInOrderSelect
         })
     }
     async update(id: number, product_id: number, count: number) {
-        return await prisma.productInOrder.update({ where: { id }, data: { product_id, count }})
+        return await prisma.productInOrder.update({ where: { id }, data: { product_id, count }, select: productInOrderSelect})
     }
     async delete(id: number) {
-        return await prisma.productInOrder.delete({ where: { id }})
+        return await prisma.productInOrder.delete({ where: { id }, select: productInOrderSelect})
     }
     async findAll(){
         return await prisma.productInOrder.findMany()
@@ -63,8 +64,11 @@ export class ProductInOrderService {
     async updateStatus(id: number, status: number) {
         return await prisma.productInOrder.update({ where: { id }, data: { status }})
     }
+    async findCustomByStatus(status: number) {
+        return await prisma.productInOrder.findMany({ where: { status }, select: productInOrderSelect})
+    }
     async updateTotalPrice(id: number, total_price: number) {
-        return await prisma.productInOrder.update({ where: { id }, data: { total_price }})
+        return await prisma.productInOrder.update({ where: { id }, data: { total_price }, select: productInOrderSelect})
     }
     async findCustomByOrderId(order_id: number) {
         return await prisma.productInOrder.findMany({

@@ -36,29 +36,12 @@ export class ProductInOrderController {
               message: "Product not found by product_id: " + product_id
             })
           } else {
-            const productInOrder = await productInOrderService.create({ user_id, order_id, product_id, count });
-            const order = await orderService.findById(productInOrder.order_id)
-            const product = await productService.findCustomById(+product_id)
-            const user = await userService.findCustomById(user_exsist.id)
-            if (order !== null && product !== null && user !== null) {
-              // update product_in_product total price
-              const proInOrder_updated = await productInOrderService.updateTotalPrice(productInOrder.id, product.price * productInOrder.count)
-              let proInOrderRes: ProductInOrderResponse = {
-                id: proInOrder_updated.id,
-                user,
-                order_id: order.id,
-                product,
-                count: proInOrder_updated.count,
-                total_price: proInOrder_updated.total_price,
-                status: proInOrder_updated.status,
-                create_date: proInOrder_updated.create_date,
-                update_date: proInOrder_updated.update_date
-              }
-              res.status(201).json({
-                message: "Product In Order success created",
-                productInOrder: proInOrderRes
-              })
-            }
+            const productInOrder_created = await productInOrderService.create({ user_id, order_id, product_id, count });
+            const productInOrder_updated = await productInOrderService.updateTotalPrice(productInOrder_created.id, productInOrder_created.product.price * productInOrder_created.count)
+            res.status(201).json({
+              message: "Product In Order success created",
+              productInOrder: productInOrder_updated
+            })
           }
         }
       }
@@ -75,24 +58,21 @@ export class ProductInOrderController {
         res.status(404).json({ error: 'Product In Order not found' });
       } else {
         const productInOrder_updated = await productInOrderService.update(productInOrder_exsist.id, +product_id, +count);
-        const order = await orderService.findById(productInOrder_updated.order_id)
-        const product = await productService.findCustomById(productInOrder_updated.product_id)
-        const user = await userService.findCustomById(productInOrder_updated.user_id)
-        if (order !== null && product !== null && user !== null) {
-          let proInOrderRes: ProductInOrderResponse = {
-            id: productInOrder_updated.id,
-            user,
-            order_id: order.id,
-            product,
-            count: productInOrder_updated.count,
-            total_price: productInOrder_updated.count * product.price,
-            status: productInOrder_updated.status,
-            create_date: productInOrder_updated.create_date,
-            update_date: productInOrder_updated.update_date
-          }
+        const proInOrder_updated = await productInOrderService.updateTotalPrice(productInOrder_updated.id, productInOrder_updated.product.price * productInOrder_updated.count)
+        if (productInOrder_updated.status == 1) {
+          const order = (await orderService.findById(productInOrder_updated.order_id))!
+          let order_total_price: number = order.total_price
+          order_total_price -= productInOrder_exsist.total_price
+          order_total_price += proInOrder_updated.total_price
+          await orderService.updateTotal(order.id, order_total_price)
           res.status(200).json({
             message: "Product In Order success updated",
-            productInOrder: proInOrderRes,
+            productInOrder: proInOrder_updated,
+          });
+        } else {
+          res.status(200).json({
+            message: "Product In Order success updated",
+            productInOrder: proInOrder_updated,
           });
         }
       }
@@ -108,24 +88,19 @@ export class ProductInOrderController {
         res.status(404).json({ error: 'Product In Order not found by id: ' + id });
       } else {
         const productInOrder_deleted = await productInOrderService.delete(productInOrder_exsist.id);
-        const order = await orderService.findById(productInOrder_deleted.order_id)
-        const product = await productService.findCustomById(productInOrder_deleted.product_id)
-        const user = await userService.findCustomById(productInOrder_deleted.user_id)
-        if (order !== null && product !== null && user !== null) {
-          let proInOrderRes: ProductInOrderResponse = {
-            id: productInOrder_deleted.id,
-            user,
-            order_id: order.id,
-            product,
-            count: productInOrder_deleted.count,
-            total_price: productInOrder_deleted.total_price,
-            status: productInOrder_deleted.status,
-            create_date: productInOrder_deleted.create_date,
-            update_date: productInOrder_deleted.update_date
-          }
-          res.status(201).json({
+        const order_product = (await orderService.findById(productInOrder_deleted.order_id))!
+        if (productInOrder_deleted.status == 1) {
+          let total_price_order = order_product.total_price
+          total_price_order -= productInOrder_deleted.total_price
+          await orderService.updateTotal(order_product.id, total_price_order)
+          res.status(200).json({
             message: "Product In Order success deleted",
-            productInOrder: proInOrderRes
+            productInOrder: productInOrder_deleted
+          })
+        } else {
+          res.status(200).json({
+            message: "Product In Order success deleted",
+            productInOrder: productInOrder_deleted
           })
         }
       }
@@ -215,6 +190,17 @@ export class ProductInOrderController {
       res.status(500).json({ error: 'Error fetching Product In Orders' });
     }
   }
+  async getByStatus(req: Request, res: Response) {
+    try {
+        const productInOrders = await productInOrderService.findCustomByStatus(0)
+        res.status(200).json({
+          message: "All Prouct In Orders status: 0",
+          productInOrders: productInOrders
+        })
+    } catch (error) {
+      res.status(500).json({ error: 'Error fetching Product In Orders' });
+    }
+  }
   async patchStatus(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -245,7 +231,7 @@ export class ProductInOrderController {
             order_id: order_pro_updated.id,
             product,
             count: proInOrder_updated.count,
-            total_price: proInOrder_updated.total_price,
+            total_price: proInOrder_updated.count * product.price,
             status: proInOrder_updated.status,
             create_date: proInOrder_updated.create_date,
             update_date: proInOrder_updated.update_date
