@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
-import proccess from "process"
-import express from "express";
+import https from "https"
+import express, { Request, Response } from "express";
 import cors, { CorsOptions } from "cors";
 // import swaggerDocs from './swagger';
 // routes
@@ -19,8 +19,18 @@ createRoleAdminWaiter();
 const app = express();
 const port = +process.env.PORT! || 3000;
 
+const userAgent = new https.Agent({
+  rejectUnauthorized: false
+})
+
 app.use(cors({ origin: '*', methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']}));
 app.use(express.json());
+app.options('*', (req: Request, res: Response) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Origin", "*")
+  res.header("User-Agent", "*")
+  res.header("Agent", "*")
+})
 app.use(express.urlencoded({ extended: true}))
 
 app.use('/api/user', userRoutes)
