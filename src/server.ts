@@ -21,7 +21,7 @@ const port = +process.env.PORT! || 3000;
 app.use(cors());
 // allow CORS:
 app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', 'https://madatota.vercel.app/');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   next();
 });
 
