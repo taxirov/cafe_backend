@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 dotenv.config();
 import express, { Request, Response } from "express";
 import cors, { CorsOptions } from "cors";
-// import swaggerDocs from './swagger';
-// routes
+import https from 'https'
+import fs from 'fs'
 import userRoutes from "./routes/user.routes";
 import categoryRoutes from "./routes/category.routes";
 import productRoutes from "./routes/product.routes";
@@ -15,18 +15,18 @@ import productInOrderRoutes from "./routes/productinorder.routes";
 import { createRoleAdminWaiter } from "./middlewares/user.middleware";
 createRoleAdminWaiter();
 
+const privateKey = fs.readFileSync(process.env.PRIVATE_KEY!);
+const certificate = fs.readFileSync(process.env.CERTIFICATE!);
+
+const credentials = {key: privateKey, cert: certificate};
+
 const app = express();
-const port = +process.env.PORT! || 3000;
 
 app.use(cors());
-// allow CORS:
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  next();
-});
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}))
+
+const port = +process.env.PORT! || 3000;
 
 app.use('/api/user', userRoutes)
 app.use('/api/category', categoryRoutes)
@@ -36,6 +36,8 @@ app.use('/api/order', orderRoutes)
 app.use('/api/room', roomRoutes)
 app.use('/api/productinorder', productInOrderRoutes)
 
-app.listen(port, () => {
+const httpsServer = https.createServer(credentials, app);
+
+httpsServer.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
