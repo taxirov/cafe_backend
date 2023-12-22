@@ -130,63 +130,38 @@ export class UserController {
           message: "User not found"
         })
       } else {
-          const role = await roleService.findById(user_exsist.role_id)
-          const user_orders = await orderService.findByUserCount(user_exsist.id)
-          const user_res: UserResponse = {
-            id: user_exsist.id,
-            name: user_exsist.name,
-            username: user_exsist.username,
-            phone: user_exsist.phone,
-            email: user_exsist.email,
-            salary: user_exsist.salary,
-            orders: user_orders,
-            image: user_exsist.image,
-            role: role?.name,
-            status: user_exsist.status,
-            create_date: user_exsist.create_date,
-            update_date: user_exsist.update_date
-          }
-          res.status(200).json({
-            message: "Verify success",
-            user: user_res
-          })
+        const role = await roleService.findById(user_exsist.role_id)
+        const user_orders = await orderService.findByUserCount(user_exsist.id)
+        const user_res: UserResponse = {
+          id: user_exsist.id,
+          name: user_exsist.name,
+          username: user_exsist.username,
+          phone: user_exsist.phone,
+          email: user_exsist.email,
+          salary: user_exsist.salary,
+          orders: user_orders,
+          image: user_exsist.image,
+          role: role?.name,
+          status: user_exsist.status,
+          create_date: user_exsist.create_date,
+          update_date: user_exsist.update_date
         }
+        res.status(200).json({
+          message: "Verify success",
+          user: user_res
+        })
+      }
     } catch (error) {
-        res.status(500).json({ message: "Error verifing token" })
+      res.status(500).json({ message: "Error verifing token" })
     }
   }
   async getAdminVerify(req: Request, res: Response) {
     try {
-      const user_id = res.locals.payload.id
-      const user_exsist = await userService.findById(+user_id);
-      if (!user_exsist) {
-        res.status(404).json({
-          message: "User not found"
-        })
-      } else {
-          const role = await roleService.findById(user_exsist.role_id)
-          const user_orders = await orderService.findByUserCount(user_exsist.id)
-          const user_res: UserResponse = {
-            id: user_exsist.id,
-            name: user_exsist.name,
-            username: user_exsist.username,
-            phone: user_exsist.phone,
-            email: user_exsist.email,
-            salary: user_exsist.salary,
-            orders: user_orders,
-            image: user_exsist.image,
-            role: role?.name,
-            status: user_exsist.status,
-            create_date: user_exsist.create_date,
-            update_date: user_exsist.update_date
-          }
-          res.status(200).json({
-            message: "Verify success",
-            user: user_res
-          })
-        }
+      res.status(200).json({
+        message: "Verify success"
+      })
     } catch (error) {
-        res.status(500).json({ message: "Error verifing token" })
+      res.status(500).json({ message: "Error verifing admin key" })
     }
   }
   async getAll(req: Request, res: Response) {
@@ -224,11 +199,11 @@ export class UserController {
               users: users_res
             })
           } else {
-            res.status(401).json({ message: "You are not admin"})
+            res.status(401).json({ message: "You are not admin" })
           }
         } else {
           res.status(404).json({ message: "Role not found" })
-        }   
+        }
       }
     } catch (error) {
       res.status(500).json({ error: 'Error getting users' })
