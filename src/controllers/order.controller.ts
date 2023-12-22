@@ -15,7 +15,17 @@ const roomService = new RoomService();
 const productService = new ProductService()
 const proInOrService = new ProductInOrderService()
 
-type UserCustom = { id: number, name: string };
+type UserCustom = {
+  id: number,
+  name: string,
+  role?: {
+    id: number,
+    name: string,
+    create_date: Date,
+    update_date: Date
+  }
+};
+
 type ProductCustom = {
   id: number,
   name: string,
@@ -23,11 +33,15 @@ type ProductCustom = {
   image: string | null,
   category_id: number
 };
-type RoomCustom = { id: number, name: string }
+
+type RoomCustom = {
+  id: number,
+  name: string
+}
 
 export type ProductInOrderResponse = {
   id: number,
-  user: UserCustom
+  user?: UserCustom,
   order_id: number,
   product: ProductCustom,
   count: number,
@@ -41,8 +55,8 @@ export type OrderResponse = {
   id: number,
   title: string,
   desc: string | null,
-  user: UserCustom,
-  room: RoomCustom | null,
+  user?: UserCustom,
+  room?: RoomCustom | null,
   products: ProductInOrderResponse[],
   total_price: number | null,
   status: number,
@@ -54,8 +68,8 @@ export type OrderWithoutProduct = {
   id: number,
   title: string,
   desc: string | null,
-  user: UserCustom,
-  room: RoomCustom | null,
+  user?: UserCustom,
+  room?: RoomCustom | null,
   total_price: number | null,
   status: number,
   create_date: Date,
@@ -255,43 +269,20 @@ export class OrderController {
     try {
       const user: Payload = res.locals.payload
       const { status_order, room_id, user_id, current_page, per_page } = req.query
-      const user_exsist = await userService.findById(user.id)
+      const user_exsist = await userService.findCustomById(user.id)
       if (user_exsist) {
-        const user_role = await roleService.findById(user_exsist.role_id);
-        if (user_role !== null && user_role.name === 'admin') {
-          async function takeOrders(orders: Order[]) {
+        if (user_exsist.role.name === 'admin') {
+          async function takeOrders(orders: OrderWithoutProduct[]) {
             let orders_res: OrderResponse[] = []
             for (let i = 0; i < orders.length; i++) {
-              // create user object
-              let user: { id: number, name: string } = (await userService.findCustomById(orders[i].user_id))!
-              // create room object
-              let room: { id: number, name: string } | null = await roomService.findCustomById(orders[i].room_id)
-              // create products list
-              let products: ProductInOrderResponse[] = []
-              const productInOrders = await proInOrService.findByOrderId(orders[i].id)
-              for (let i = 0; i < productInOrders.length; i++) {
-                const user_pro = await userService.findCustomById(productInOrders[i].user_id)
-                const product_pro = await productService.findCustomById(productInOrders[i].product_id)
-                if (user_pro !== null && product_pro !== null) {
-                  let product: ProductInOrderResponse = {
-                    id: productInOrders[i].id,
-                    user: user_pro,
-                    order_id: productInOrders[i].order_id,
-                    product: product_pro,
-                    count: productInOrders[i].count,
-                    total_price: productInOrders[i].count * product_pro.price,
-                    create_date: productInOrders[i].create_date,
-                    update_date: productInOrders[i].update_date,
-                    status: productInOrders[i].status
-                  }
-                  products.push(product)
-                }
-              }
+              let products = await proInOrService.findCustomByOrderId(orders[i].id)
               let order: OrderResponse = {
                 id: orders[i].id,
                 title: orders[i].title,
                 desc: orders[i].desc,
-                user, room, products,
+                user: orders[i].user,
+                room: orders[i].room,
+                products,
                 total_price: orders[i].total_price,
                 status: orders[i].status,
                 create_date: orders[i].create_date,
@@ -302,7 +293,8 @@ export class OrderController {
           }
           const default_current_page = 1
           const default_per_page = 12
-          let total_order_count = (await orderService.findAll()).length
+          const max_per_page = 96
+          let total_order_count = 0
           let total_page_count: number = 1
           if (total_order_count > default_per_page) {
             total_page_count = Math.floor(total_order_count / default_per_page)
@@ -315,9 +307,100 @@ export class OrderController {
             if (status_order !== undefined && status_order !== '') {
               if (room_id !== undefined && room_id !== '') {
                 if (user_id !== undefined && user_id !== '') {
-                  let orders_status_room_user = await orderService.findByUserStatusRoom(+user_id, +status_order, +room_id, +current_page, +per_page)
-                  let orders: OrderResponse[] = await takeOrders(orders_status_room_user)
-                  total_order_count = orders.length
+                  if (+per_page > 96) {
+                    let orders_status_room_user: OrderWithoutProduct[] = (await orderService.findByUserStatusRoomPagination(+user_id, +status_order, +room_id, +current_page, max_per_page))
+                    let orders: OrderResponse[] = await takeOrders(orders_status_room_user)
+                    total_order_count = (await orderService.findByUserStatusRoomCount(+user_id, +status_order, +room_id))
+                    if (total_order_count > +per_page) {
+                      total_page_count = Math.floor(total_order_count / +per_page)
+                      if (total_order_count % (+per_page) > 0) {
+                        total_page_count += 1
+                      }
+                    }
+                    res.status(200).json({
+                      message: "Orders with all queries. !Max per_page = 96",
+                      orders,
+                      status_order: +status_order,
+                      room_id: +room_id,
+                      user_id: +user_id,
+                      current_page: +current_page,
+                      per_page: +per_page,
+                      total_page_count,
+                      total_order_count
+                    })
+                  } else {
+                    let orders_status_room_user: OrderWithoutProduct[] = (await orderService.findByUserStatusRoomPagination(+user_id, +status_order, +room_id, +current_page, +per_page))
+                    let orders: OrderResponse[] = await takeOrders(orders_status_room_user)
+                    total_order_count = (await orderService.findByUserStatusRoomCount(+user_id, +status_order, +room_id))
+                    if (total_order_count > +per_page) {
+                      total_page_count = Math.floor(total_order_count / +per_page)
+                      if (total_order_count % (+per_page) > 0) {
+                        total_page_count += 1
+                      }
+                    }
+                    res.status(200).json({
+                      message: "Orders with all queries.",
+                      orders,
+                      status_order: +status_order,
+                      room_id: +room_id,
+                      user_id: +user_id,
+                      current_page: +current_page,
+                      per_page: +per_page,
+                      total_page_count,
+                      total_order_count
+                    })
+                  }
+
+                } else {
+                  if (+per_page > 96) {
+                    const orders_status_room: OrderWithoutProduct[] = await orderService.findByStatusRoomPagination(+status_order, +room_id, +current_page, max_per_page)
+                    let orders: OrderResponse[] = await takeOrders(orders_status_room)
+                    total_order_count = await orderService.findByStatusRoomCount(+status_order, +room_id,)
+                    if (total_order_count > +per_page) {
+                      total_page_count = Math.floor(total_order_count / +per_page)
+                      if (total_order_count % (+per_page) > 0) {
+                        total_page_count += 1
+                      }
+                    }
+                    res.status(200).json({
+                      message: "Orders without user_id. !Max per_page = 96",
+                      orders,
+                      status_order: +status_order,
+                      room_id: +room_id,
+                      user_id: null,
+                      current_page: +current_page,
+                      per_page: +per_page,
+                      total_page_count,
+                      total_order_count
+                    })
+                  } else {
+                    const orders_status_room: OrderWithoutProduct[] = await orderService.findByStatusRoomPagination(+status_order, +room_id, +current_page, +per_page)
+                    let orders: OrderResponse[] = await takeOrders(orders_status_room)
+                    total_order_count = await orderService.findByStatusRoomCount(+status_order, +room_id,)
+                    if (total_order_count > +per_page) {
+                      total_page_count = Math.floor(total_order_count / +per_page)
+                      if (total_order_count % (+per_page) > 0) {
+                        total_page_count += 1
+                      }
+                    }
+                    res.status(200).json({
+                      message: "Orders without user_id.",
+                      orders,
+                      status_order: +status_order,
+                      room_id: +room_id,
+                      user_id: null,
+                      current_page: +current_page,
+                      per_page: +per_page,
+                      total_page_count,
+                      total_order_count
+                    })
+                  }
+                }
+              } else {
+                if (+per_page > 96) {
+                  const orders_status = await orderService.findByStatusPagination(+status_order, +current_page, max_per_page)
+                  let orders: OrderResponse[] = await takeOrders(orders_status)
+                  total_order_count = await orderService.findByStatusCount(+status_order)
                   if (total_order_count > +per_page) {
                     total_page_count = Math.floor(total_order_count / +per_page)
                     if (total_order_count % (+per_page) > 0) {
@@ -325,8 +408,57 @@ export class OrderController {
                     }
                   }
                   res.status(200).json({
+                    message: "Orders without user_id. !Max per_page = 96",
                     orders,
                     status_order: +status_order,
+                    room_id: null,
+                    user_id: null,
+                    current_page: +current_page,
+                    per_page: +per_page,
+                    total_page_count,
+                    total_order_count
+                  })
+                } else {
+                  const orders_status = await orderService.findByStatusPagination(+status_order, +current_page, +per_page)
+                  let orders: OrderResponse[] = await takeOrders(orders_status)
+                  total_order_count = await orderService.findByStatusCount(+status_order)
+                  if (total_order_count > +per_page) {
+                    total_page_count = Math.floor(total_order_count / +per_page)
+                    if (total_order_count % (+per_page) > 0) {
+                      total_page_count += 1
+                    }
+                  }
+                  res.status(200).json({
+                    message: "Orders without user_id and room_id",
+                    orders,
+                    status_order: +status_order,
+                    room_id: null,
+                    user_id: null,
+                    current_page: +current_page,
+                    per_page: +per_page,
+                    total_page_count,
+                    total_order_count
+                  })
+                }
+              }
+            }
+            // orders by room_id and user_id
+            else if (room_id !== undefined && room_id !== '') {
+              if (user_id !== undefined && user_id !== '') {
+                total_order_count = await orderService.findByUserRoomCount(+user_id, +room_id)
+                if (total_order_count > +per_page) {
+                  total_page_count = Math.floor(total_order_count / +per_page)
+                  if (total_order_count % (+per_page) > 0) {
+                    total_page_count += 1
+                  }
+                }
+                if (+per_page > 96) {
+                  let orders_room_user = await orderService.findByUserRoomPagination(+user_id, +room_id, +current_page, max_per_page)
+                  let orders: OrderResponse[] = await takeOrders(orders_room_user)
+                  res.status(200).json({
+                    message: "Orders without status_order. !Max per_page = 96",
+                    orders,
+                    status_order: null,
                     room_id: +room_id,
                     user_id: +user_id,
                     current_page: +current_page,
@@ -335,20 +467,14 @@ export class OrderController {
                     total_order_count
                   })
                 } else {
-                  const orders_status_room = await orderService.findByStatusRoom(+status_order, +room_id, +current_page, +per_page)
-                  let orders: OrderResponse[] = await takeOrders(orders_status_room)
-                  total_order_count = orders.length
-                  if (total_order_count > +per_page) {
-                    total_page_count = Math.floor(total_order_count / +per_page)
-                    if (total_order_count % (+per_page) > 0) {
-                      total_page_count += 1
-                    }
-                  }
+                  let orders_room_user = await orderService.findByUserRoomPagination(+user_id, +room_id, +current_page, +per_page)
+                  let orders: OrderResponse[] = await takeOrders(orders_room_user)
                   res.status(200).json({
+                    message: "Orders without status_order.",
                     orders,
-                    status_order: +status_order,
+                    status_order: null,
                     room_id: +room_id,
-                    user_id: undefined,
+                    user_id: +user_id,
                     current_page: +current_page,
                     per_page: +per_page,
                     total_page_count,
@@ -356,43 +482,61 @@ export class OrderController {
                   })
                 }
               } else {
-                const orders_status = await orderService.findByStatus(+status_order, +current_page, +per_page)
-                let orders: OrderResponse[] = await takeOrders(orders_status)
-                total_order_count = orders.length
+                total_order_count = await orderService.findByRoomCount(+room_id)
                 if (total_order_count > +per_page) {
                   total_page_count = Math.floor(total_order_count / +per_page)
                   if (total_order_count % (+per_page) > 0) {
                     total_page_count += 1
                   }
                 }
-                res.status(200).json({
-                  orders,
-                  status_order: +status_order,
-                  room_id: undefined,
-                  user_id: undefined,
-                  current_page: +current_page,
-                  per_page: +per_page,
-                  total_page_count,
-                  total_order_count
-                })
+                if (+per_page > 96) {
+                  const orders_room = await orderService.findByRoomPagination(+room_id, +current_page, max_per_page)
+                  let orders: OrderResponse[] = await takeOrders(orders_room)
+                  res.status(200).json({
+                    message: "Orders without status_order and user_id. !Max per_page = 96",
+                    orders,
+                    status_order: null,
+                    room_id: +room_id,
+                    user_id: null,
+                    current_page: +current_page,
+                    per_page: +per_page,
+                    total_page_count,
+                    total_order_count
+                  })
+                } else {
+                  const orders_room = await orderService.findByRoomPagination(+room_id, +current_page, +per_page)
+                  let orders: OrderResponse[] = await takeOrders(orders_room)
+                  res.status(200).json({
+                    message: "Orders without status_order and user_id",
+                    orders,
+                    status_order: null,
+                    room_id: +room_id,
+                    user_id: null,
+                    current_page: +current_page,
+                    per_page: +per_page,
+                    total_page_count,
+                    total_order_count
+                  })
+                }
               }
             }
-            // orders by room_id and user_id
-            else if (room_id !== undefined && room_id !== '') {
-              if (user_id !== undefined && user_id !== '') {
-                let orders_room_user = await orderService.findByUserRoom(+user_id, +room_id, +current_page, +per_page)
-                let orders: OrderResponse[] = await takeOrders(orders_room_user)
-                total_order_count = orders.length
-                if (total_order_count > +per_page) {
-                  total_page_count = Math.floor(total_order_count / +per_page)
-                  if (total_order_count % (+per_page) > 0) {
-                    total_page_count += 1
-                  }
+            // orders by user_id
+            else if (user_id !== undefined && user_id !== '') {
+              total_order_count = await orderService.findByUserCount(+user_id)
+              if (total_order_count > +per_page) {
+                total_page_count = Math.floor(total_order_count / +per_page)
+                if (total_order_count % (+per_page) > 0) {
+                  total_page_count += 1
                 }
+              }
+              if (+per_page > 96) {
+                let orders_user = await orderService.findByUserPagination(+user_id, +current_page, max_per_page)
+                let orders: OrderResponse[] = await takeOrders(orders_user)
                 res.status(200).json({
+                  message: "Orders by user_id. !Max per_page = 96",
                   orders,
-                  status_order: undefined,
-                  room_id: +room_id,
+                  status_order: null,
+                  room_id: null,
                   user_id: +user_id,
                   current_page: +current_page,
                   per_page: +per_page,
@@ -400,20 +544,14 @@ export class OrderController {
                   total_order_count
                 })
               } else {
-                const orders_room = await orderService.findByRoom(+room_id, +current_page, +per_page)
-                let orders: OrderResponse[] = await takeOrders(orders_room)
-                total_order_count = orders.length
-                if (total_order_count > +per_page) {
-                  total_page_count = Math.floor(total_order_count / +per_page)
-                  if (total_order_count % (+per_page) > 0) {
-                    total_page_count += 1
-                  }
-                }
+                let orders_user = await orderService.findByUserPagination(+user_id, +current_page, +per_page)
+                let orders: OrderResponse[] = await takeOrders(orders_user)
                 res.status(200).json({
+                  message: "Orders by user_id",
                   orders,
-                  status_order: undefined,
-                  room_id: +room_id,
-                  user_id: undefined,
+                  status_order: null,
+                  room_id: null,
+                  user_id: +user_id,
                   current_page: +current_page,
                   per_page: +per_page,
                   total_page_count,
@@ -421,54 +559,49 @@ export class OrderController {
                 })
               }
             }
-            // orders by user_id
-            else if (user_id !== undefined && user_id !== '') {
-              let orders_user = await orderService.findByUser(+user_id, +current_page, +per_page)
-              let orders: OrderResponse[] = await takeOrders(orders_user)
-              total_order_count = orders.length
-              if (total_order_count > +per_page) {
-                total_page_count = Math.floor(total_order_count / +per_page)
-                if (total_order_count % (+per_page) > 0) {
-                  total_page_count += 1
-                }
-              }
-              res.status(200).json({
-                orders,
-                status_order: undefined,
-                room_id: undefined,
-                user_id: +user_id,
-                current_page: +current_page,
-                per_page: +per_page,
-                total_page_count,
-                total_order_count
-              })
-            }
-            // orders by pagination
+            // orders by pagination to do
             else {
-              const orders_pag = await orderService.findAllByPagination(+current_page, +per_page)
-              let orders: OrderResponse[] = await takeOrders(orders_pag)
-              total_order_count = orders.length
+              total_order_count = await orderService.findAllCount()
               if (total_order_count > +per_page) {
                 total_page_count = Math.floor(total_order_count / +per_page)
                 if (total_order_count % (+per_page) > 0) {
                   total_page_count += 1
                 }
               }
-              res.status(200).json({
-                orders,
-                status_order: undefined,
-                room_id: undefined,
-                user_id: undefined,
-                current_page: +current_page,
-                per_page: +per_page,
-                total_page_count,
-                total_order_count
-              })
+              if (+per_page > 96) {
+                const orders_pag = await orderService.findAllPagination(+current_page, max_per_page)
+                let orders: OrderResponse[] = await takeOrders(orders_pag)
+                res.status(200).json({
+                  message: 'All order with pagination. !Max per_page = 96',
+                  orders,
+                  status_order: null,
+                  room_id: null,
+                  user_id: null,
+                  current_page: +current_page,
+                  per_page: +per_page,
+                  total_page_count,
+                  total_order_count
+                })
+              } else {
+                const orders_pag = await orderService.findAllPagination(+current_page, +per_page)
+                let orders: OrderResponse[] = await takeOrders(orders_pag)
+                res.status(200).json({
+                  message: 'All order with pagination',
+                  orders,
+                  status_order: null,
+                  room_id: null,
+                  user_id: null,
+                  current_page: +current_page,
+                  per_page: +per_page,
+                  total_page_count,
+                  total_order_count
+                })
+              }
             }
           } else {
-            const orders_default = await orderService.findAllByPagination(default_current_page, default_per_page)
+            const orders_default = await orderService.findAllPagination(default_current_page, default_per_page)
             let orders: OrderResponse[] = await takeOrders(orders_default)
-            total_order_count = orders.length
+            total_order_count = await orderService.findAllCount()
             if (total_order_count > default_per_page) {
               total_page_count = Math.floor(total_order_count / default_per_page)
               if (total_order_count % default_per_page > 0) {
@@ -476,10 +609,11 @@ export class OrderController {
               }
             }
             res.status(200).json({
+              message: "All orders by default pagination",
               orders,
-              status_order: undefined,
-              room_id: undefined,
-              user_id: undefined,
+              status_order: null,
+              room_id: null,
+              user_id: null,
               current_page: default_current_page,
               per_page: default_per_page,
               total_page_count,

@@ -25,7 +25,7 @@ export class UserService {
         return await prisma.user.findMany({ where: { role_id } })
     }
     async findCustomById(id: number) {
-        return await prisma.user.findUnique({ where: { id }, select: { id: true, name: true} })
+        return await prisma.user.findUnique({ where: { id }, select: { id: true, name: true, role: true } })
     }
     async findByUsername(username: string) {
         return await prisma.user.findUnique({ where: { username }})

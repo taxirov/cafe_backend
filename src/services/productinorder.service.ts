@@ -4,7 +4,8 @@ import { PrInOrServiceModel } from "../models/productinoder.model";
 
 const userSelect: Prisma.UserSelect = {
     id: true,
-    name: true
+    name: true,
+    role: true
 }
 const productSelect: Prisma.ProductSelect = {
     id: true,
@@ -62,7 +63,7 @@ export class ProductInOrderService {
         return await prisma.productInOrder.findMany({ where: { product_id }})
     }
     async updateStatus(id: number, status: number) {
-        return await prisma.productInOrder.update({ where: { id }, data: { status }})
+        return await prisma.productInOrder.update({ where: { id }, data: { status }, select: productInOrderSelect })
     }
     async findCustomByStatus(status: number) {
         return await prisma.productInOrder.findMany({ where: { status }, select: productInOrderSelect})

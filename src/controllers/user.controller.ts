@@ -89,7 +89,7 @@ export class UserController {
             phone: user_exsist.phone
           }
           const token = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: "7d" })
-          const user_orders = await orderService.findByUser(user_exsist.id, 1, 10000)
+          const user_orders = await orderService.findByUserCount(user_exsist.id)
           const user_res: UserResponse = {
             id: user_exsist.id,
             name: user_exsist.name,
@@ -97,7 +97,7 @@ export class UserController {
             phone: user_exsist.phone,
             email: user_exsist.email,
             salary: user_exsist.salary,
-            orders: user_orders.length,
+            orders: user_orders,
             image: user_exsist.image,
             role: role?.name,
             status: user_exsist.status,
@@ -131,7 +131,7 @@ export class UserController {
         })
       } else {
           const role = await roleService.findById(user_exsist.role_id)
-          const user_orders = await orderService.findByUser(user_exsist.id, 1, 10000)
+          const user_orders = await orderService.findByUserCount(user_exsist.id)
           const user_res: UserResponse = {
             id: user_exsist.id,
             name: user_exsist.name,
@@ -139,7 +139,7 @@ export class UserController {
             phone: user_exsist.phone,
             email: user_exsist.email,
             salary: user_exsist.salary,
-            orders: user_orders.length,
+            orders: user_orders,
             image: user_exsist.image,
             role: role?.name,
             status: user_exsist.status,
@@ -165,7 +165,7 @@ export class UserController {
         })
       } else {
           const role = await roleService.findById(user_exsist.role_id)
-          const user_orders = await orderService.findByUser(user_exsist.id, 1, 10000)
+          const user_orders = await orderService.findByUserCount(user_exsist.id)
           const user_res: UserResponse = {
             id: user_exsist.id,
             name: user_exsist.name,
@@ -173,7 +173,7 @@ export class UserController {
             phone: user_exsist.phone,
             email: user_exsist.email,
             salary: user_exsist.salary,
-            orders: user_orders.length,
+            orders: user_orders,
             image: user_exsist.image,
             role: role?.name,
             status: user_exsist.status,
@@ -203,7 +203,7 @@ export class UserController {
             let users_res: UserResponse[] = []
             for (let i = 0; i < users.length; i++) {
               const role = await roleService.findById(users[i].role_id)
-              const user_orders = await orderService.findByUser(users[i].id, 1, 10000)
+              const user_orders = await orderService.findByUserCount(users[i].id)
               users_res.push({
                 id: users[i].id,
                 name: users[i].name,
@@ -214,7 +214,7 @@ export class UserController {
                 salary: users[i].salary,
                 role: role?.name,
                 status: users[i].status,
-                orders: user_orders.length,
+                orders: user_orders,
                 create_date: users[i].create_date,
                 update_date: users[i].update_date
               })
@@ -245,7 +245,7 @@ export class UserController {
       } else {
         const user_deleted = await userService.delete(+id)
         const role = await roleService.findById(user.role_id)
-        const user_orders = await orderService.findByUser(user_deleted.id, 1, 10000)
+        const user_orders = await orderService.findByUserCount(user_deleted.id)
         const user_res: UserResponse = {
           id: user_deleted.id,
           name: user_deleted.name,
@@ -256,7 +256,7 @@ export class UserController {
           salary: user_deleted.salary,
           image: user_deleted.image,
           status: user_deleted.status,
-          orders: user_orders.length,
+          orders: user_orders,
           create_date: user_deleted.create_date,
           update_date: user_deleted.update_date
         }
@@ -283,7 +283,7 @@ export class UserController {
       } else {
         const user = await userService.updateData(+id, name, username, phone, salary, email, role_id, status)
         const role = await roleService.findById(user.role_id)
-        const user_orders = await orderService.findByUser(user.id, 1, 10000)
+        const user_orders = await orderService.findByUserCount(user.id)
         const user_res: UserResponse = {
           id: user.id,
           name: user.name,
@@ -291,7 +291,7 @@ export class UserController {
           phone: user.phone,
           email: user.email,
           salary: user.salary,
-          orders: user_orders.length,
+          orders: user_orders,
           image: user.image,
           status: user.status,
           role: role?.name,
