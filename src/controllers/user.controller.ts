@@ -249,14 +249,14 @@ export class UserController {
   async put(req: Request, res: Response) {
     try {
       const { id } = req.params
-      const { name, username, salary, role_id, phone, email, status } = req.body
+      const { name, username, salary, role_id, phone, email, status, password } = req.body
       const user_exsist = await userService.findById(+id)
       if (!user_exsist) {
         res.status(404).json({
           message: "User not found by id: " + id
         })
       } else {
-        const user = await userService.updateData(+id, name, username, phone, salary, email, role_id, status)
+        const user = await userService.updateData(+id, name, username, phone, salary, email, role_id, status, password)
         const role = await roleService.findById(user.role_id)
         const user_orders = await orderService.findByUserCount(user.id)
         const user_res: UserResponse = {
@@ -281,6 +281,44 @@ export class UserController {
     } catch (error) {
       res.status(500).json({
         message: "Error updating user data"
+      })
+    }
+  }
+  async patchStatus(req: Request, res: Response) {
+    try {
+      const { id } = req.params
+      const { status } = req.body
+      const user = await userService.findById(+id)
+      if (!user) {
+        res.status(404).json({
+          message: "User not found by id: " + id
+        })
+      } else {
+        const user_updated = await userService.updateStatus(+id, +status)
+        const role = await roleService.findById(user.role_id)
+        const user_orders = await orderService.findByUserCount(user_updated.id)
+        const user_res: UserResponse = {
+          id: user_updated.id,
+          name: user_updated.name,
+          username: user_updated.username,
+          phone: user_updated.phone,
+          email: user_updated.email,
+          role: role?.name,
+          salary: user_updated.salary,
+          image: user_updated.image,
+          status: user_updated.status,
+          orders: user_orders,
+          create_date: user_updated.create_date,
+          update_date: user_updated.update_date
+        }
+        res.status(200).json({
+          message: "User already updated by id: " + id,
+          user: user_res
+        })
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: "Error patching user status"
       })
     }
   }

@@ -15,5 +15,6 @@ router.get('/verify', checkToken, userController.getTokenVerify)
 router.get('/admin', checkAdmin, userController.getAdminVerify)
 router.delete('/:id', checkToken, checkAdmin, userController.delete)
 router.put('/:id',  checkToken, checkAdmin, userController.put)
+router.patch('/:id', checkToken, checkAdmin, userController.patchStatus)
 
 export default router;

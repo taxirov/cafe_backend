@@ -42,11 +42,14 @@ export class UserService {
     async updatePassword(id: number, password: string) {
         return await prisma.user.update({ where: { id }, data: { password }})
     }
-    async updateData(id: number, name: string, username: string, phone: string, salary: number, email: string, role_id: number, status: number) {
+    async updateData(id: number, name: string, username: string, phone: string, salary: number, email: string, role_id: number, status: number, password: string) {
         return await prisma.user.update({
             where: { id },
-            data: { name, username, phone, salary, email, role_id, status }
+            data: { name, username, phone, salary, email, role_id, status, password }
         })
+    }
+    async updateStatus(id: number, status: number) {
+        return await prisma.user.update({ where: { id }, data: { status }})
     }
     async delete(id: number) {
         return await prisma.user.delete({ where: { id }})
