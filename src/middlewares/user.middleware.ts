@@ -55,6 +55,6 @@ export async function addHeaders(req: Request, res: Response, next: NextFunction
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', 'https://madatota.vercel.app');
     // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS, PATCH, DELETE');
     next();
 }
