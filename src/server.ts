@@ -23,7 +23,7 @@ const credentials = {key: privateKey, cert: certificate};
 const app = express();
 
 app.use(cors({
-  origin: '*'
+  origin: 'https://madatota.vercel.app'
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}))
