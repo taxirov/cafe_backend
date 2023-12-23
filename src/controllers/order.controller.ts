@@ -60,7 +60,7 @@ export type OrderResponse = {
   products: ProductInOrderResponse[],
   total_price: number | null,
   status: number,
-  create_date: Date,
+  create_date: string,
   update_date: Date
 }
 
@@ -72,7 +72,7 @@ export type OrderWithoutProduct = {
   room?: RoomCustom | null,
   total_price: number | null,
   status: number,
-  create_date: Date,
+  create_date: string,
   update_date: Date
 }
 
@@ -90,7 +90,8 @@ export class OrderController {
       } else {
         if (room_id === null) {
           // create order
-          const order_created = await orderService.create({ title, desc, user_id, room_id });
+          const new_date = new Date().toJSON()
+          const order_created = await orderService.create({ title, desc, user_id, room_id, create_date: new_date });
           // create user object
           let user: { id: number, name: string } = { id: user_exsist.id, name: user_exsist.name }
           // create room object
@@ -123,7 +124,8 @@ export class OrderController {
             })
           } else {
             // create order
-            const order_created = await orderService.create({ title, desc, user_id, room_id });
+            const new_date = new Date().toJSON()
+            const order_created = await orderService.create({ title, desc, user_id, room_id, create_date: new_date });
             // create user object
             let user: { id: number, name: string } = { id: user_exsist.id, name: user_exsist.name }
             // update status room_exsist 
@@ -731,6 +733,38 @@ export class OrderController {
     } catch (error) {
       res.status(500).json({
         message: "Error patching status"
+      })
+    }
+  }
+  async getByYearMonthDay(req: Request, res: Response) {
+    try {
+      const { create_date } = req.query
+      if (create_date != undefined) {
+        const orders = await orderService.findByYearMonthDay(create_date.toString())
+        const orders_res: OrderResponse[] = []
+            for (let i = 0; i < orders.length; i++) {
+              let order: OrderResponse = {
+                id: orders[i].id,
+                title: orders[i].title,
+                desc: orders[i].desc,
+                user: orders[i].user,
+                room: orders[i].room,
+                products: await proInOrService.findCustomByOrderId(orders[i].id),
+                total_price: orders[i].total_price,
+                status: orders[i].status,
+                create_date: orders[i].create_date,
+                update_date: orders[i].update_date
+              }
+              orders_res.push(order)
+            }
+        res.status(200).json({
+          message: "All orders",
+          orders: orders_res
+        })
+      }
+    } catch(error) {
+      res.status(500).json({
+        message: "Error getting orders"
       })
     }
   }

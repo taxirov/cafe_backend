@@ -196,7 +196,7 @@ export class ProductInOrderController {
       const { status } = req.params 
         const productInOrders = await productInOrderService.findCustomByStatus(+status)
         res.status(200).json({
-          message: "All Prouct In Orders status: 0",
+          message: "All Prouct In Orders status: " + status,
           productInOrders: productInOrders
         })
     } catch (error) {

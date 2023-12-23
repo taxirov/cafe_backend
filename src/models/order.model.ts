@@ -3,6 +3,7 @@ export type OrderCreateModel = {
     desc: string
     room_id: number | null
     user_id: number
+    create_date: string
 }
 
 export type OrderUpdateModel = {

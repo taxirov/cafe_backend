@@ -14,10 +14,20 @@ const productSelect: Prisma.ProductSelect = {
     image: true,
     category_id: true
 }
+const roomSelect: Prisma.RoomSelect = {
+    id: true,
+    name: true
+}
+const orderSelect: Prisma.OrderSelect = {
+    id: true,
+    room: { select: roomSelect }
+}
+
 const productInOrderSelect: Prisma.ProductInOrderSelect = {
     id: true,
     user: { select: userSelect },
     order_id: true,
+    order: { select: orderSelect },
     product: { select: productSelect },
     count: true,
     total_price: true,

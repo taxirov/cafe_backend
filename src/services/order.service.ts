@@ -40,7 +40,6 @@ const orderSelect: Prisma.OrderSelect = {
     create_date: true,
     update_date: true
 }
-
 export class OrderService {
     async create(dto: OrderCreateModel) {
         return await prisma.order.create({
@@ -48,7 +47,8 @@ export class OrderService {
                 title: dto.title,
                 desc: dto.desc,
                 user_id: dto.user_id,
-                room_id: dto.room_id
+                room_id: dto.room_id,
+                create_date: dto.create_date
             }
         })
     }
@@ -70,12 +70,19 @@ export class OrderService {
         return await prisma.order.findMany()
     }
     async findAllByStatus(status: number) {
-        return await prisma.order.findMany({ where: { status }, select: orderSelect })
+        return await prisma.order.findMany({ 
+            where: { status }, 
+            select: orderSelect, 
+            orderBy: { create_date: 'desc' } })
     }
     async findAllPagination(page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
-        return await prisma.order.findMany({ skip, take, select: orderSelect })
+        return await prisma.order.findMany({ 
+            skip, 
+            take, 
+            select: orderSelect, 
+            orderBy: { create_date: 'desc' } })
     }
     async findAllCount() {
         return (await prisma.order.findMany({ select: { id: true } })).length
@@ -86,7 +93,12 @@ export class OrderService {
     async findByUserPagination(user_id: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
-        return await prisma.order.findMany({ where: { user_id }, skip, take, select: orderSelect })
+        return await prisma.order.findMany({ 
+            where: { user_id }, 
+            skip, 
+            take, 
+            select: orderSelect, 
+            orderBy: { create_date: 'desc' } })
     }
     async findByUserCount(user_id: number) {
         return (await prisma.order.findMany({ where: { user_id }, select: { id: true } })).length
@@ -94,7 +106,13 @@ export class OrderService {
     async findByRoomPagination(room_id: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
-        return await prisma.order.findMany({ where: { room_id }, skip, take, select: orderSelect })
+        return await prisma.order.findMany({ 
+            where: { room_id }, 
+            skip, 
+            take, 
+            select: orderSelect,
+            orderBy: { create_date: 'desc' }
+         })
     }
     async findByRoomCount(room_id: number) {
         return (await prisma.order.findMany({ where: { room_id }, select: { id: true } })).length
@@ -102,17 +120,32 @@ export class OrderService {
     async findCustomByUserStatus(user_id: number, status: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
-        return await prisma.order.findMany({ where: { user_id, status }, select: orderSelect, skip, take })
+        return await prisma.order.findMany({ 
+            where: { user_id, status }, 
+            select: orderSelect, 
+            skip, 
+            take, 
+            orderBy: { create_date: 'desc' }
+        })
     }
     async findByUserStatusPagination(user_id: number, status: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
-        return await prisma.order.findMany({ where: { user_id, status }, skip, take })
+        return await prisma.order.findMany({ 
+            where: { user_id, status }, 
+            skip, 
+            take, 
+            orderBy: { create_date: 'desc' } 
+        })
     }
     async findByStatusPagination(status: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
-        return await prisma.order.findMany({ where: { status }, skip, take, select: orderSelect })
+        return await prisma.order.findMany({ 
+            where: { status }, 
+            skip, take, 
+            select: orderSelect, 
+            orderBy: { create_date: 'desc' } })
     }
     async findByStatusCount(status: number) {
         return (await prisma.order.findMany({ where: { status }, select: { id: true } })).length
@@ -120,7 +153,12 @@ export class OrderService {
     async findByStatusRoomPagination(status: number, room_id: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
-        return await prisma.order.findMany({ where: { status, room_id }, skip, take, select: orderSelect })
+        return await prisma.order.findMany({ 
+            where: { status, room_id }, 
+            skip, 
+            take, 
+            select: orderSelect, 
+            orderBy: { create_date: 'desc' } })
     }
     async findByStatusRoomCount(status: number, room_id: number) {
         return (await prisma.order.findMany({ where: { status, room_id }, select: { id: true } })).length
@@ -128,7 +166,12 @@ export class OrderService {
     async findByUserRoomPagination(user_id: number, room_id: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
-        return await prisma.order.findMany({ where: { user_id, room_id }, skip, take, select: orderSelect })
+        return await prisma.order.findMany({ 
+            where: { user_id, room_id }, 
+            skip, 
+            take, 
+            select: orderSelect, 
+            orderBy: { create_date: 'desc' } })
     }
     async findByUserRoomCount(user_id: number, room_id: number) {
         return (await prisma.order.findMany({ where: { user_id, room_id }, select: { id: true } })).length
@@ -139,7 +182,12 @@ export class OrderService {
     async findByUserStatusRoomPagination(user_id: number, status: number, room_id: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
-        return await prisma.order.findMany({ where: { user_id, status, room_id }, skip, take, select: orderSelect })
+        return await prisma.order.findMany({ 
+            where: { user_id, status, room_id }, 
+            skip, 
+            take, 
+            select: orderSelect,
+            orderBy: { create_date: 'desc' } })
     }
     async updateStatus(id: number, status: number) {
         return await prisma.order.update({ where: { id }, data: { status } })
@@ -149,7 +197,17 @@ export class OrderService {
     }
     async findAllOrders() {
         return await prisma.order.findMany({
-            select: orderSelect
+            select: orderSelect,
+            orderBy: { create_date: 'desc' }
+        })
+    }
+    async findByYearMonthDay(day: string) {
+        return await prisma.order.findMany({
+            where: {
+                create_date: {
+                    startsWith: day
+                }
+            }, select: orderSelect
         })
     }
 }

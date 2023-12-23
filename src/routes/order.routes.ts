@@ -13,6 +13,7 @@ router.put('/:id', validator.body(orderPutSchema), checkToken, orderController.p
 router.delete('/:id', checkToken, checkAdmin, orderController.delete);
 router.get('/', validator.query(orderGetSchema), checkToken, orderController.get)
 router.get('/waiter', checkToken, orderController.getWaiter)
+router.get('/date', checkToken, orderController.getByYearMonthDay)
 router.patch('/:id/status', checkToken, checkAdmin, orderController.patchStatus)
 
 export default router;
