@@ -30,6 +30,7 @@ app.use(express.urlencoded({ extended: true}))
 
 const port = +process.env.PORT! || 3000;
 
+
 app.use('/api/user', userRoutes)
 app.use('/api/category', categoryRoutes)
 app.use('/api/product', productRoutes)
