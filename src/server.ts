@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors, { CorsOptions } from "cors";
 import https from 'https'
 import fs from 'fs'
@@ -31,6 +31,11 @@ app.use(express.urlencoded({ extended: true}))
 
 const port = +process.env.PORT! || 3000;
 
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  next();
+});
 
 app.use('/api/user', userRoutes)
 app.use('/api/category', categoryRoutes)
