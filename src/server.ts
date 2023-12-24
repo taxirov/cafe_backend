@@ -25,12 +25,14 @@ const app = express();
 app.use(cors({
   origin: '*', 
   credentials: true,
+  allowedHeaders: 'Content-Type, Access-Token, Admin-Key',
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}))
 
 app.use((req, res, next) => {
-  console.log('Request received:', req.method, req.url);
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', '*')
   next();
 });
 
