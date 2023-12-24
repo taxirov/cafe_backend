@@ -25,7 +25,7 @@ const app = express();
 app.use(cors({
   origin: '*', 
   credentials: true,
-  allowedHeaders: 'Content-Type, Access-Token, Admin-Key',
+  allowedHeaders: ['Content-Type', 'Access-Token', 'Admin-Key']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}))
