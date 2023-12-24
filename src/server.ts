@@ -15,10 +15,10 @@ import productInOrderRoutes from "./routes/productinorder.routes";
 import { createRoleAdminWaiter } from "./middlewares/user.middleware";
 createRoleAdminWaiter();
 
-const privateKey = fs.readFileSync(process.env.PRIVATE_KEY!);
-const certificate = fs.readFileSync(process.env.CERTIFICATE!);
+// const privateKey = fs.readFileSync(process.env.PRIVATE_KEY!);
+// const certificate = fs.readFileSync(process.env.CERTIFICATE!);
 
-const credentials = { key: privateKey, cert: certificate };
+// const credentials = { key: privateKey, cert: certificate };
 
 const app = express();
 
@@ -45,8 +45,8 @@ app.use('/api/order', orderRoutes)
 app.use('/api/room', roomRoutes)
 app.use('/api/productinorder', productInOrderRoutes)
 
-const httpsServer = https.createServer(credentials, app);
+// const httpsServer = https.createServer(credentials, app);
 
-httpsServer.listen(port, () => {
+app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
