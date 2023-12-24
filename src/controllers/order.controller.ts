@@ -657,10 +657,10 @@ export class OrderController {
             }
             return waiter_orders
           }
-          const orders_waiter = await orderService.findCustomByUserStatus(user_exsist.id, 1, 1, 100)
+          const orders_waiter = await orderService.findByStatusPagination(1, 1, 100)
           let orders: OrderResponse[] = await addProductsOrder(orders_waiter)
           res.status(200).json({
-            message: user_exsist.name + " orders",
+            message: "All active orders",
             orders
           })
         } else {
