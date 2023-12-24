@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors, { CorsOptions } from "cors";
 import https from 'https'
 import fs from 'fs'
@@ -18,13 +18,22 @@ createRoleAdminWaiter();
 const privateKey = fs.readFileSync(process.env.PRIVATE_KEY!);
 const certificate = fs.readFileSync(process.env.CERTIFICATE!);
 
-const credentials = {key: privateKey, cert: certificate};
+const credentials = { key: privateKey, cert: certificate };
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  allowedHeaders: ['Content-Type', 'Access-Token', 'Admin-Key'],
+  credentials: true
+},
+));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true}))
+app.use(express.urlencoded({ extended: true }))
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  next()
+})
 
 const port = +process.env.PORT! || 3000;
 
