@@ -22,17 +22,14 @@ const credentials = {key: privateKey, cert: certificate};
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://madatota.vercel.app', 
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}))
 
 const port = +process.env.PORT! || 3000;
-
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', '*');
-  next();
-});
 
 app.use('/api/user', userRoutes)
 app.use('/api/category', categoryRoutes)
