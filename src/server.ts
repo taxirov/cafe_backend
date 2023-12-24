@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import express, { NextFunction, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import cors, { CorsOptions } from "cors";
 import https from 'https'
 import fs from 'fs'
@@ -22,19 +22,9 @@ const credentials = {key: privateKey, cert: certificate};
 
 const app = express();
 
-app.use(cors({
-  origin: '*', 
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Access-Token', 'Admin-Key']
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}))
-
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', '*')
-  next();
-});
 
 const port = +process.env.PORT! || 3000;
 

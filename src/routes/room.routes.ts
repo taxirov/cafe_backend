@@ -8,9 +8,9 @@ const router = express.Router();
 const validator = expressJoiValidation.createValidator({ passError: true });
 const roomController = new RoomController();
 
-router.post('/', addHeaders, validator.body(roomValidationSchema), checkToken, checkAdmin, roomController.post);
-router.put('/:id', addHeaders, validator.body(roomValidationSchema), checkToken, checkAdmin, roomController.put);
-router.delete('/:id', addHeaders, checkToken, checkAdmin, roomController.delete);
-router.get('/', addHeaders, checkToken, roomController.get);
+router.post('/',   validator.body(roomValidationSchema), checkToken, checkAdmin, roomController.post);
+router.put('/:id',   validator.body(roomValidationSchema), checkToken, checkAdmin, roomController.put);
+router.delete('/:id',   checkToken, checkAdmin, roomController.delete);
+router.get('/',   checkToken, roomController.get);
 
 export default router;

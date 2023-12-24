@@ -9,9 +9,9 @@ const router = express.Router();
 const validator = createValidator();
 const categoryController = new CategoryController()
 
-router.post('/', addHeaders, checkAdmin, validator.body(categoryPostSchema), categoryController.post);
-router.get('/', addHeaders, categoryController.get)
-router.delete('/:id', addHeaders, checkAdmin, categoryController.delete)
-router.put('/:id', addHeaders, checkAdmin, validator.body(categoryPutSchema), categoryController.put);
+router.post('/',   checkAdmin, validator.body(categoryPostSchema), categoryController.post);
+router.get('/',   categoryController.get)
+router.delete('/:id',   checkAdmin, categoryController.delete)
+router.put('/:id',   checkAdmin, validator.body(categoryPutSchema), categoryController.put);
 
 export default router;

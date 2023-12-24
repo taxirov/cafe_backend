@@ -8,12 +8,12 @@ const router = express.Router();
 const validator = expressJoiValidation.createValidator({ passError: true });
 const orderController = new OrderController();
 
-router.post('/', addHeaders, validator.body(orderPostSchema), checkToken, orderController.post);
-router.put('/:id', addHeaders, validator.body(orderPutSchema), checkToken, orderController.put);
-router.delete('/:id', addHeaders, checkToken, checkAdmin, orderController.delete);
-router.get('/', addHeaders, validator.query(orderGetSchema), checkToken, orderController.get)
-router.get('/waiter', addHeaders, checkToken, orderController.getWaiter)
-router.get('/date', addHeaders, checkToken, orderController.getByYearMonthDay)
-router.patch('/:id/status', addHeaders, checkToken, checkAdmin, orderController.patchStatus)
+router.post('/',   validator.body(orderPostSchema), checkToken, orderController.post);
+router.put('/:id',   validator.body(orderPutSchema), checkToken, orderController.put);
+router.delete('/:id',   checkToken, checkAdmin, orderController.delete);
+router.get('/',   validator.query(orderGetSchema), checkToken, orderController.get)
+router.get('/waiter',   checkToken, orderController.getWaiter)
+router.get('/date',   checkToken, orderController.getByYearMonthDay)
+router.patch('/:id/status',   checkToken, checkAdmin, orderController.patchStatus)
 
 export default router;

@@ -50,7 +50,3 @@ export async function createRoleAdminWaiter() {
     }
 }
 
-
-export async function addHeaders(req: Request, res: Response, next: NextFunction) {
-    next()
-}
