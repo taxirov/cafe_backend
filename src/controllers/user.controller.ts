@@ -80,40 +80,45 @@ export class UserController {
           message: "User not found"
         })
       } else {
-        if (password === user_exsist.password) {
-          const role = await roleService.findById(user_exsist.role_id)
-          const payload: Payload = {
-            id: user_exsist.id,
-            name: user_exsist.name,
-            username: user_exsist.username,
-            phone: user_exsist.phone
-          }
-          const token = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: "7d" })
-          const user_orders = await orderService.findByUserCount(user_exsist.id)
-          const user_res: UserResponse = {
-            id: user_exsist.id,
-            name: user_exsist.name,
-            username: user_exsist.username,
-            phone: user_exsist.phone,
-            email: user_exsist.email,
-            salary: user_exsist.salary,
-            orders: user_orders,
-            image: user_exsist.image,
-            role: role?.name,
-            status: user_exsist.status,
-            create_date: user_exsist.create_date,
-            update_date: user_exsist.update_date
-          }
-          res.status(200).json({
-            message: "Login success",
-            user: user_res,
-            token
+        if (user_exsist.status == 0) {
+          res.status(403).json({
+            message: "You are not active site. Please contact admin."
           })
         } else {
-          res.status(401).json({
-            message: "Password or username wrong"
-          })
-        }
+          if (password === user_exsist.password) {
+            const role = await roleService.findById(user_exsist.role_id)
+            const payload: Payload = {
+              id: user_exsist.id,
+              name: user_exsist.name,
+              username: user_exsist.username,
+              phone: user_exsist.phone
+            }
+            const token = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: "7d" })
+            const user_orders = await orderService.findByUserCount(user_exsist.id)
+            const user_res: UserResponse = {
+              id: user_exsist.id,
+              name: user_exsist.name,
+              username: user_exsist.username,
+              phone: user_exsist.phone,
+              email: user_exsist.email,
+              salary: user_exsist.salary,
+              orders: user_orders,
+              image: user_exsist.image,
+              role: role?.name,
+              status: user_exsist.status,
+              create_date: user_exsist.create_date,
+              update_date: user_exsist.update_date
+            }
+            res.status(200).json({
+              message: "Login success",
+              user: user_res,
+              token
+            })
+          } else {
+            res.status(401).json({
+              message: "Password or username wrong"
+            })
+          }}
       }
     } catch (error) {
       res.status(500).json({
