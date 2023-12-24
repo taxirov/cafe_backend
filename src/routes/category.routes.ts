@@ -3,7 +3,6 @@ import { CategoryController } from '../controllers/category.controller';
 import { createValidator } from 'express-joi-validation';
 import { categoryPostSchema, categoryPutSchema } from "../validations/category.validation";
 import { checkAdmin, checkToken } from "../middlewares/user.middleware";
-import { addHeaders } from "../middlewares/user.middleware"
 
 const router = express.Router();
 const validator = createValidator();

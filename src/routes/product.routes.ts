@@ -1,5 +1,5 @@
 import express from "express";
-import {   checkAdmin } from "../middlewares/user.middleware";
+import {  checkAdmin } from "../middlewares/user.middleware";
 import { createValidator } from "express-joi-validation";
 import { ProductController } from "../controllers/product.controller";
 import { productPostSchema, productPutSchema, productGetSchema } from "../validations/product.validation";

@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkToken, checkAdmin, addHeaders } from '../middlewares/user.middleware'
+import { checkToken, checkAdmin } from '../middlewares/user.middleware'
 import { OrderController } from '../controllers/order.controller';
 import expressJoiValidation from 'express-joi-validation';
 import { orderPostSchema, orderPutSchema, orderGetSchema } from '../validations/order.validation';
