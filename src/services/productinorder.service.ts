@@ -58,7 +58,7 @@ export class ProductInOrderService {
         return await prisma.productInOrder.findMany()
     }
     async findById(id: number){
-        return await prisma.productInOrder.findUnique({ where: { id }})
+        return await prisma.productInOrder.findUnique({ where: { id }, select: productInOrderSelect})
     }
     async findByUserId(user_id: number){
         return await prisma.productInOrder.findMany({ where: { user_id }})
