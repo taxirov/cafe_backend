@@ -214,22 +214,28 @@ export class ProductInOrderController {
         })
       }
       else {
-        const proInOrder_updated = await productInOrderService.updateStatus(+id, +status)
-        const order_product = await orderService.findById(proInOrder_updated.order_id)
-        if (order_product !== null) {
-          let total_price_order: number
-          // update order total price
-          if (+status === 1) {
-            total_price_order = order_product.total_price + proInOrder_updated.total_price
-          } else {
-            total_price_order = order_product.total_price - proInOrder_updated.total_price
-          }
-          await orderService.updateTotal(order_product.id, total_price_order)
-          res.status(201).json({
+        if (proInOrder_exsist.status == 1) {
+          res.status(200).json({
             message: "Product status success updated",
-            productInOrder: proInOrder_updated
+            productInOrder: proInOrder_exsist
           })
-        }
+        } else {
+          const proInOrder_updated = await productInOrderService.updateStatus(+id, +status)
+          const order_product = await orderService.findById(proInOrder_updated.order_id)
+          if (order_product !== null) {
+            let total_price_order: number
+            // update order total price
+            if (+status === 1) {
+              total_price_order = order_product.total_price + proInOrder_updated.total_price
+            } else {
+              total_price_order = order_product.total_price - proInOrder_updated.total_price
+            }
+            await orderService.updateTotal(order_product.id, total_price_order)
+            res.status(200).json({
+              message: "Product status success updated",
+              productInOrder: proInOrder_updated
+            })
+          }}
       }
     }
     catch (error) {
