@@ -19,7 +19,7 @@ export class RoleController {
       const { name } = req.body;
       const role_exsist = await roleService.findByName(name)
       if (role_exsist) {
-        res.status(403).json({
+        res.status(409).json({
           message: "Role already exsist by name: " + name,
           role: role_exsist
         })

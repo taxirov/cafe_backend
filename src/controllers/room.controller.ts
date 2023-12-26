@@ -9,7 +9,7 @@ export class RoomController {
       const { name, desc, capacity } = req.body;
       const room_exsist = await roomService.findByName(name)
       if (room_exsist) {
-        res.status(403).json({
+        res.status(409).json({
           message: "Room already exsist by name: " + name,
           room: room_exsist
         })

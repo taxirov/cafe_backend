@@ -14,7 +14,7 @@ export class CategoryController {
       const { name, desc } = req.body;
       const exsist_category = await categoryService.findByName(name);
       if (exsist_category) {
-        res.status(403).json({
+        res.status(409).json({
           message: "Category already exsist"
         })
       } else {

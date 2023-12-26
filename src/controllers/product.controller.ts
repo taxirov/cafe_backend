@@ -11,7 +11,7 @@ export class ProductController {
       const { name, price, category_id, desc } = req.body;
       const product_exsist = await productService.findByName(name)
       if (product_exsist) {
-        res.status(403).json({
+        res.status(409).json({
           message: "Product already exsist by name: " + name,
           product: product_exsist
         })

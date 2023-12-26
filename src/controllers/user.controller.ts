@@ -36,7 +36,7 @@ export class UserController {
       const { name, username, password, salary, role_id, phone, email } = req.body;
       const user_exsist = await userService.findByUsername(username)
       if (user_exsist) {
-        res.status(403).json({ message: "User already exsist with username: " + username })
+        res.status(409).json({ message: "User already exsist with username: " + username })
       } else {
         const user = await userService.create({ name, username, password, salary, role_id, phone, email });
         const role = await roleService.findById(role_id)
