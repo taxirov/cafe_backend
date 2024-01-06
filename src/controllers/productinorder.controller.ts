@@ -4,8 +4,6 @@ import { OrderService } from "../services/order.service";
 import { UserService } from "../services/user.service";
 import { ProductService } from "../services/product.service";
 import { RoomService } from '../services/room.service';
-import { Order, ProductInOrder } from '@prisma/client';
-import type { OrderResponse, ProductInOrderResponse } from './order.controller';
 
 const productInOrderService = new ProductInOrderService();
 const orderService = new OrderService();
@@ -18,6 +16,7 @@ export class ProductInOrderController {
     try {
       const user_id = res.locals.payload.id;
       const { order_id, product_id, count } = req.body;
+      
       const user_exsist = await userService.findById(+user_id)
       if (!user_exsist) {
         res.status(404).json({
@@ -37,10 +36,12 @@ export class ProductInOrderController {
             })
           } else {
             const productInOrder_created = await productInOrderService.create({ user_id, order_id, product_id, count });
+        
             const productInOrder_updated = await productInOrderService.updateTotalPrice(productInOrder_created.id, productInOrder_created.product.price * productInOrder_created.count)
             res.status(201).json({
               message: "Product In Order success created",
-              productInOrder: productInOrder_updated
+              productInOrder: productInOrder_updated,
+              body: req.body
             })
           }
         }

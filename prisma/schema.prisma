@@ -80,7 +80,7 @@ model ProductInOrder {
   user_id     Int
   order_id    Int
   product_id  Int
-  count       Int
+  count       Float
   status      Int      @default(0)
   total_price Int      @default(0)
   create_date DateTime @default(now())
