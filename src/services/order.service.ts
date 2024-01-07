@@ -90,6 +90,9 @@ export class OrderService {
     async findById(id: number) {
         return await prisma.order.findUnique({ where: { id } })
     }
+    async findByDesc(desc: string) {
+        return await prisma.order.findMany({ where: { desc: { startsWith: desc } } })
+    }
     async findByUserPagination(user_id: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;

@@ -333,7 +333,7 @@ export class OrderController {
                   } else {
                     let orders_status_room_user: OrderWithoutProduct[] = (await orderService.findByUserStatusRoomPagination(+user_id, +status_order, +room_id, +current_page, +per_page))
                     let orders: OrderResponse[] = await takeOrders(orders_status_room_user)
-                    total_order_count = (await orderService.findByUserStatusRoomCount(+user_id, +status_order, +room_id))
+                    total_order_count = await orderService.findByUserStatusRoomCount(+user_id, +status_order, +room_id)
                     if (total_order_count > +per_page) {
                       total_page_count = Math.floor(total_order_count / +per_page)
                       if (total_order_count % (+per_page) > 0) {
