@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
-import { BookService } from '../services/book.service'
+import { BookService } from '../services/book.service';
 import { OrderService } from '../services/order.service';
+import { RoomService } from "../services/room.service";
 
 const bookService = new BookService()
 const orderService = new OrderService()
+const roomService = new RoomService()
 
 export type Book = {
     id: number,
@@ -53,7 +55,7 @@ export class BookController {
             const payload = res.locals.payload
             const { room_id, person, price, booker_name, booked_date } = req.body
             const book_exsist = await bookService.findByBookedDate(booked_date)
-            if (book_exsist) {
+            if (book_exsist) {  
                 res.status(409).json({ book: book_exsist })
             } else {
                 const book_created = await bookService.create(+room_id, payload.id, +price, +person, booker_name, booked_date)
@@ -113,11 +115,17 @@ export class BookController {
         try {
             const books: Book[] = req.body.books
             for (let i in books) {
-                let book_exsist = await bookService.findById(books[i].id)
-                if (book_exsist && book_exsist.status == 1) {
-                    let create_date = new Date()
-                    await orderService.create({ room_id: books[i].room.id, user_id: books[i].user.id, create_date: create_date.toJSON(), desc: `${books[i].booked_date}. Mijoz ${books[i].booker_name}. Mijozlar soni ${books[i].person}. Bron narxi ${books[i].price}`, title: books[i].booker_name })
-                    await bookService.updateStatus(books[i].id, 0)
+                let room_i = await roomService.findById(books[i].room.id)
+                if (room_i) {
+                    if (!room_i.booked) {
+                        let book_exsist = await bookService.findById(books[i].id)
+                        if (book_exsist && book_exsist.status == 1) {
+                            let create_date = new Date()
+                            await orderService.create({ room_id: books[i].room.id, user_id: books[i].user.id, create_date: create_date.toJSON(), desc: `${books[i].booked_date}. Mijoz ${books[i].booker_name}. Mijozlar soni ${books[i].person}. Bron narxi ${books[i].price}`, title: books[i].booker_name })
+                            await bookService.updateStatus(books[i].id, 0)
+                            await roomService.updateBooked(books[i].room.id, true)
+                        }
+                    }
                 }
             }
             res.status(200)
