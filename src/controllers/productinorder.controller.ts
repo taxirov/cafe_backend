@@ -4,6 +4,7 @@ import { OrderService } from "../services/order.service";
 import { UserService } from "../services/user.service";
 import { ProductService } from "../services/product.service";
 import { RoomService } from '../services/room.service';
+import { OrderResponse, OrderWithoutProduct } from './order.controller';
 
 const productInOrderService = new ProductInOrderService();
 const orderService = new OrderService();
@@ -11,12 +12,31 @@ const userService = new UserService();
 const productService = new ProductService();
 const roomService = new RoomService();
 
+async function takeOrders(orders: OrderWithoutProduct[]) {
+  let orders_res: OrderResponse[] = []
+  for (let i = 0; i < orders.length; i++) {
+    let products = await productInOrderService.findCustomByOrderId(orders[i].id)
+    let order: OrderResponse = {
+      id: orders[i].id,
+      title: orders[i].title,
+      desc: orders[i].desc,
+      user: orders[i].user,
+      room: orders[i].room,
+      products,
+      total_price: orders[i].total_price,
+      status: orders[i].status,
+      create_date: orders[i].create_date,
+      update_date: orders[i].update_date
+    }
+    orders_res.push(order)
+  } return orders_res
+}
+
 export class ProductInOrderController {
   async post(req: Request, res: Response) {
     try {
       const user_id = res.locals.payload.id;
       const { order_id, product_id, count } = req.body;
-      
       const user_exsist = await userService.findById(+user_id)
       if (!user_exsist) {
         res.status(404).json({
@@ -36,12 +56,12 @@ export class ProductInOrderController {
             })
           } else {
             const productInOrder_created = await productInOrderService.create({ user_id, order_id, product_id, count });
-        
             const productInOrder_updated = await productInOrderService.updateTotalPrice(productInOrder_created.id, productInOrder_created.product.price * productInOrder_created.count)
+            const orders = await takeOrders(await orderService.findByStatusPagination(1, 1, 50))
             res.status(201).json({
               message: "Product In Order success created",
               productInOrder: productInOrder_updated,
-              body: req.body
+              orders
             })
           }
         }
@@ -66,14 +86,18 @@ export class ProductInOrderController {
           order_total_price -= productInOrder_exsist.total_price
           order_total_price += proInOrder_updated.total_price
           await orderService.updateTotal(order.id, order_total_price)
+          const orders = await takeOrders(await orderService.findByStatusPagination(1, 1, 50))
           res.status(200).json({
             message: "Product In Order success updated",
             productInOrder: proInOrder_updated,
+            orders
           });
         } else {
+          const orders = await takeOrders(await orderService.findByStatusPagination(1, 1, 50))
           res.status(200).json({
             message: "Product In Order success updated",
             productInOrder: proInOrder_updated,
+            orders
           });
         }
       }
@@ -94,14 +118,18 @@ export class ProductInOrderController {
           let total_price_order = order_product.total_price
           total_price_order -= productInOrder_deleted.total_price
           await orderService.updateTotal(order_product.id, total_price_order)
+          const orders = await takeOrders(await orderService.findByStatusPagination(1, 1, 50))
           res.status(200).json({
             message: "Product In Order success deleted",
-            productInOrder: productInOrder_deleted
+            productInOrder: productInOrder_deleted,
+            orders
           })
         } else {
+          const orders = await takeOrders(await orderService.findByStatusPagination(1, 1, 50))
           res.status(200).json({
             message: "Product In Order success deleted",
-            productInOrder: productInOrder_deleted
+            productInOrder: productInOrder_deleted,
+            orders
           })
         }
       }
@@ -109,89 +137,6 @@ export class ProductInOrderController {
       res.status(500).json({ error: 'Error deleting Product In Order' });
     }
   }
-  // to do
-  // async get(req: Request, res: Response) {
-  //   try {
-  //     const { order_id, product_id } = req.query
-  //     async function findProductInOrders(productInOrders: ProductInOrder[]) {
-  //       let productInOrdersRes: ProductInOrderResponse[] = []
-  //       for (let i = 0; i < productInOrders.length; i++) {
-  //         const order = await orderService.findById(productInOrders[i].order_id)
-  //         const product = await productService.findCustomById(productInOrders[i].product_id)
-  //         const user = await userService.findCustomById(productInOrders[i].user_id)
-  //         if (order !== null && product !== null && user !== null) {
-  //           let proInOrderRes: ProductInOrderResponse = {
-  //             id: productInOrders[i].id,
-  //             user,
-  //             order_id: order.id,
-  //             product,
-  //             count: productInOrders[i].count,
-  //             total_price: productInOrders[i].total_price,
-  //             status: productInOrders[i].status,
-  //             create_date: productInOrders[i].create_date,
-  //             update_date: productInOrders[i].update_date
-  //           }
-  //           productInOrdersRes.push(proInOrderRes)
-  //         }
-  //       } return productInOrdersRes
-  //     }
-  //     if (order_id !== undefined && order_id !== '') {
-  //       const order = await orderService.findById(+order_id)
-  //       if (!order) {
-  //         res.status(404).json({
-  //           message: "Order not found by order_id: " + order
-  //         })
-  //       } else {
-  //         if (product_id !== undefined && product_id !== '') {
-  //           const product = await productService.findById(+product_id)
-  //           if (!product) {
-  //             res.status(404).json({
-  //               message: "Product not found by id: " + product_id
-  //             })
-  //           } else {
-  //             const productInOrders = await productInOrderService.findByOrderProduct(order.id, product.id)
-  //             const pro_res = await findProductInOrders(productInOrders)
-  //             res.status(200).json({
-  //               message: "Prouct In Orders by order_id: " + order_id + " and product_id: " + product_id,
-  //               productInOrders: pro_res
-  //             })
-  //           }
-
-  //         } else {
-  //           const productInOrders = await productInOrderService.findByOrderId(order.id)
-  //           const pro_res = await findProductInOrders(productInOrders)
-  //           res.status(200).json({
-  //             message: "Product In Orders by order_id: " + order_id,
-  //             productInOrders: pro_res
-  //           })
-  //         }
-  //       }
-  //     } else if (product_id !== undefined && product_id !== '') {
-  //       const product = await productService.findById(+product_id)
-  //       if (!product) {
-  //         res.status(404).json({
-  //           message: "Product not found by id: " + product_id
-  //         })
-  //       } else {
-  //         const productInOrders = await productInOrderService.findByProductId(product.id)
-  //         const pro_res = await findProductInOrders(productInOrders)
-  //         res.status(200).json({
-  //           message: "Prouct In Orders by product_id: " + product_id,
-  //           productInOrders: pro_res
-  //         })
-  //       }
-  //     } else {
-  //       const productInOrders = await productInOrderService.findAll()
-  //       const pro_res = await findProductInOrders(productInOrders)
-  //       res.status(200).json({
-  //         message: "All Prouct In Orders",
-  //         productInOrders: pro_res
-  //       })
-  //     }
-  //   } catch (error) {
-  //     res.status(500).json({ error: 'Error fetching Product In Orders' });
-  //   }
-  // }
   async getByStatus(req: Request, res: Response) {
     try {
       const { status } = req.params 
@@ -216,9 +161,11 @@ export class ProductInOrderController {
       }
       else {
         if (proInOrder_exsist.status == 1) {
+          const orders = await takeOrders(await orderService.findByStatusPagination(1, 1, 50))
           res.status(200).json({
             message: "Product status success updated",
-            productInOrder: proInOrder_exsist
+            productInOrder: proInOrder_exsist,
+            orders
           })
         } else {
           const proInOrder_updated = await productInOrderService.updateStatus(+id, +status)
@@ -232,9 +179,11 @@ export class ProductInOrderController {
               total_price_order = order_product.total_price - proInOrder_updated.total_price
             }
             await orderService.updateTotal(order_product.id, total_price_order)
+            const orders = await takeOrders(await orderService.findByStatusPagination(1, 1, 50))
             res.status(200).json({
               message: "Product status success updated",
-              productInOrder: proInOrder_updated
+              productInOrder: proInOrder_updated,
+              orders
             })
           }}
       }

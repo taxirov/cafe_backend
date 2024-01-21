@@ -5,7 +5,6 @@ import { RoleService } from "../services/role.service";
 import { RoomService } from "../services/room.service";
 import { ProductService } from "../services/product.service";
 import { ProductInOrderService } from '../services/productinorder.service';
-import { Order, User } from '@prisma/client';
 import { Payload } from './user.controller';
 
 const orderService = new OrderService();
@@ -76,6 +75,26 @@ export type OrderWithoutProduct = {
   update_date: Date
 }
 
+async function take_orders(orders: OrderWithoutProduct[]) {
+  let orders_res: OrderResponse[] = []
+  for (let i = 0; i < orders.length; i++) {
+    let products = await proInOrService.findCustomByOrderId(orders[i].id)
+    let order: OrderResponse = {
+      id: orders[i].id,
+      title: orders[i].title,
+      desc: orders[i].desc,
+      user: orders[i].user,
+      room: orders[i].room,
+      products,
+      total_price: orders[i].total_price,
+      status: orders[i].status,
+      create_date: orders[i].create_date,
+      update_date: orders[i].update_date
+    }
+    orders_res.push(order)
+  } return orders_res
+}
+
 
 export class OrderController {
   async post(req: Request, res: Response) {
@@ -91,27 +110,14 @@ export class OrderController {
         if (room_id === null) {
           // create order
           const new_date = new Date().toJSON()
-          const order_created = await orderService.create({ title, desc, user_id, room_id, create_date: new_date });
-          // create user object
-          let user: { id: number, name: string } = { id: user_exsist.id, name: user_exsist.name }
-          // create room object
-          let room: { id: number, name: string } | null = null
-          // create response order object
-          let order: OrderResponse = {
-            id: order_created.id,
-            title: order_created.title,
-            desc: order_created.desc,
-            user, room, products: [],
-            total_price: order_created.total_price,
-            status: order_created.status,
-            create_date: order_created.create_date,
-            update_date: order_created.update_date
-          }
+          await orderService.create({ title, desc, user_id, room_id, create_date: new_date });
+          const orders = await take_orders(await orderService.findByStatusPagination(1, 1, 50))
+          const rooms = await roomService.findAll()
           res.status(201).json({
             message: "Order success created",
-            order
+            orders,
+            rooms
           });
-          const room_exsist = await roomService.findById(+room_id)
         } else {
           const room_exsist = await roomService.findById(+room_id)
           if (!room_exsist) {
@@ -125,27 +131,14 @@ export class OrderController {
           } else {
             // create order
             const new_date = new Date().toJSON()
-            const order_created = await orderService.create({ title, desc, user_id, room_id, create_date: new_date });
-            // create user object
-            let user: { id: number, name: string } = { id: user_exsist.id, name: user_exsist.name }
-            // update status room_exsist 
-            const room_order = await roomService.updateBooked(room_exsist.id, true)
-            // create room object
-            let room: { id: number, name: string } | null = { id: room_order.id, name: room_order.name }
-            // create response order object
-            let order: OrderResponse = {
-              id: order_created.id,
-              title: order_created.title,
-              desc: order_created.desc,
-              user, room, products: [],
-              total_price: 0,
-              status: order_created.status,
-              create_date: order_created.create_date,
-              update_date: order_created.update_date
-            }
+            await orderService.create({ title, desc, user_id, room_id, create_date: new_date });
+            await roomService.updateBooked(room_exsist.id, true)
+            const orders = await take_orders(await orderService.findByStatusPagination(1, 1, 50))
+            const rooms = await roomService.findAll()
             res.status(201).json({
               message: "Order success created",
-              order
+              orders,
+              rooms
             });
           }
         }
@@ -235,29 +228,22 @@ export class OrderController {
       const order_exsist = await orderService.findById(+id)
       if (order_exsist) {
         const order_deleted = await orderService.delete(+id);
-        let products = await proInOrService.findCustomByOrderId(order_deleted.id)
-        let order = {
-          id: order_deleted.id,
-          title: order_deleted.title,
-          desc: order_deleted.desc,
-          user: order_deleted.user,
-          room: order_deleted.room,
-          products,
-          total_price: order_deleted.total_price,
-          status: order_deleted.status,
-          create_date: order_deleted.create_date,
-          update_date: order_deleted.update_date
-        }
-        if (order.room != null) {
-          await roomService.updateBooked(order.room.id, false)
+        if (order_deleted.room != null) {
+          await roomService.updateBooked(order_deleted.room.id, false)
+          const orders = await take_orders(await orderService.findByStatusPagination(1, 1, 50))
+          const rooms = await roomService.findAll()
           res.status(200).json({
             message: "Order success deleted",
-            order
+            orders,
+            rooms
           });
         } else {
+          const orders = await take_orders(await orderService.findByStatusPagination(1, 1, 50))
+          const rooms = await roomService.findAll()
           res.status(200).json({
             message: "Order success deleted",
-            order
+            orders,
+            rooms
           });
         }
       } else {
@@ -684,51 +670,14 @@ export class OrderController {
         })
       } else {
         const order_updated = await orderService.updateStatus(+id, +status);
-        const user_order = await userService.findById(order_updated.user_id);
-        if (user_order !== null) {
-          // create user object
-          let user: { id: number, name: string } = { id: user_order.id, name: user_order.name }
-          // create products array
-          let products: ProductInOrderResponse[] = []
-          const productInOrders = await proInOrService.findByOrderId(order_updated.id)
-          for (let i = 0; i < productInOrders.length; i++) {
-            const user_pro = await userService.findById(productInOrders[i].user_id)
-            const product_pro = await productService.findById(productInOrders[i].product_id)
-            if (user_pro !== null && product_pro !== null) {
-              let product: ProductInOrderResponse = {
-                id: productInOrders[i].id,
-                user: { id: user_pro.id, name: user_pro.name },
-                order_id: productInOrders[i].order_id,
-                product: { id: product_pro.id, name: product_pro.name, price: product_pro.price, image: product_pro.image, category_id: product_pro.category_id },
-                count: productInOrders[i].count,
-                total_price: productInOrders[i].count * product_pro.price,
-                create_date: productInOrders[i].create_date,
-                update_date: productInOrders[i].update_date,
-                status: productInOrders[i].status
-              }
-              products.push(product)
-            }
-          }
-          // create room object
-          let room: { id: number, name: string } | null = await roomService.findCustomById(order_updated.room_id)
-          let order: OrderResponse = {
-            id: order_updated.id,
-            title: order_updated.title,
-            desc: order_updated.desc,
-            user, room, products,
-            total_price: order_updated.total_price,
-            status: order_updated.status,
-            create_date: order_updated.create_date,
-            update_date: order_updated.update_date
-          }
-          if (room) {
-            await roomService.updateBooked(room.id, false)
-          }
-          res.status(200).json({
-            message: "Order status success updated",
-            order
-          })
-        }
+        if (order_updated.room_id) {  await roomService.updateBooked(order_updated.room_id, false) }
+        const orders = await take_orders(await orderService.findByStatusPagination(1, 1, 50))
+        const rooms = await roomService.findAll()
+        res.status(200).json({
+          message: "Order status success updated",
+          orders,
+          rooms
+        })
       }
     } catch (error) {
       res.status(500).json({

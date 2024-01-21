@@ -84,7 +84,8 @@ export class ProductInOrderService {
     async findCustomByOrderId(order_id: number) {
         return await prisma.productInOrder.findMany({
             where: { order_id },
-            select: productInOrderSelect
+            select: productInOrderSelect,
+            orderBy: { create_date: 'asc' }
         })
     }
 }
