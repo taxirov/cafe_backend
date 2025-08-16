@@ -1,11 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
-import express, { NextFunction, Request, Response } from "express";
-import cors, { CorsOptions } from "cors";
-import https from 'https'
-import fs from 'fs'
+import express, { type NextFunction, type Request, type Response } from "express";
+import cors from "cors";
 import userRoutes from "./routes/user.routes";
-import categoryRoutes from "./routes/category.routes";
+import categoryRoutes from   "./routes/category.routes";
 import productRoutes from "./routes/product.routes";
 import roleRoutes from "./routes/role.routes";
 import orderRoutes from "./routes/order.routes";
