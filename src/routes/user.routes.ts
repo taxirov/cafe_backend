@@ -2,7 +2,7 @@ import express from 'express';
 import { UserController } from "../controllers/user.controller";
 import { createValidator } from 'express-joi-validation';
 import { userValidationSchemaRegister } from '../validations/user.validation';
-import {   checkAdmin, checkToken } from '../middlewares/user.middleware';
+import { checkAdmin, checkToken } from '../middlewares/user.middleware';
 
 const router = express.Router();
 const validator = createValidator();
